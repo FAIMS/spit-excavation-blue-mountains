@@ -1,0 +1,1691 @@
+import java.util.concurrent.Callable;
+/*** 'Editable' - you can edit the code below based on the needs ***/
+User user; // don't touch
+String userid;
+
+addActionBarItem("sync", new ToggleActionButtonCallback() {
+    actionOnLabel() {
+        "Disable Sync";
+    }
+    actionOn() {
+        setSyncEnabled(false);
+        setFileSyncEnabled(false);
+        showToast("Sync disabled.");
+    }
+    isActionOff() {
+        isSyncEnabled();
+    }
+    actionOffLabel() {
+        "Enable Sync";
+    }
+    actionOff() {
+        setSyncEnabled(true);
+        setFileSyncEnabled(true);
+        showToast("Sync enabled.");
+    }
+});
+
+addActionBarItem("internal_gps", new ToggleActionButtonCallback() {
+    actionOnLabel() {
+        "Disable Internal GPS";
+    }
+    actionOn() {
+        stopGPS();
+        showToast("GPS disabled.");
+        updateTrackStatus();
+    }
+    isActionOff() {
+        isInternalGPSOn();
+    }
+    actionOffLabel() {
+        "Enable Internal GPS";
+    }
+    actionOff() {
+        if(isExternalGPSOn()) {
+            stopGPS();
+        }
+        startInternalGPS();
+        showToast("GPS enabled.");
+        updateTrackStatus();
+    }
+});
+
+addActionBarItem("external_gps", new ToggleActionButtonCallback() {
+    actionOnLabel() {
+        "Disable External GPS";
+    }
+    actionOn() {
+        stopGPS();
+        showToast("GPS disabled.");
+        updateTrackStatus();
+
+    }
+    isActionOff() {
+        isExternalGPSOn();
+    }
+    actionOffLabel() {
+        "Enable External GPS";
+    }
+    actionOff() {
+        if(isInternalGPSOn()) {
+            stopGPS();
+        }
+        startExternalGPS();
+        if(isBluetoothConnected()) {
+            showToast("GPS enabled.");
+        } else {
+            showToast("Please enable bluetooth.");
+            this.isActionOff();
+        }
+        updateTrackStatus();
+    }
+});
+
+makeLocalID() {
+    fetchOne("CREATE TABLE IF NOT EXISTS localSettings (key text primary key, value text);", null);
+    fetchOne("drop view if exists identifierAsSpreadsheet;", null);
+    fetchOne("create view identifierAsSpreadsheet as select uuid, group_concat(coalesce(measure || ' ' || vocabname || '(' ||freetext||')',  measure || ' (' || freetext ||')',  vocabname || ' (' || freetext ||')',  measure || ' ' || vocabname ,  vocabname || ' (' || freetext || ')',  measure || ' (' || freetext || ')',  measure,  vocabname,  freetext,  measure,  vocabname,  freetext), ' ') as response from (select * from latestNonDeletedArchentIdentifiers order by attributename) group by uuid;", null);
+}
+
+makeLocalID();
+onEvent("control", "show", "setIDNull()");
+onEvent("control/Excavation_Data", "show", "refreshTrenchList()");
+onEvent("control/Excavation_Data/newTrench", "click","newTrench(false)");
+onEvent("control/Excavation_Data/TrenchList", "click", "loadTrench()");
+
+onEvent("control/Units", "show", "refreshUnitList()");
+onEvent("control/Units/UnitList", "click", "loadSpit()");
+
+setIDNull() {
+    trench_id = null;
+    unit_id = null;
+    artefact_id = null;
+    removeNavigationButton("duplicate");
+    removeNavigationButton("new");
+    removeNavigationButton("close");
+    removeNavigationButton("delete");
+}
+
+refreshTrenchList() {
+    fetchAll("SELECT uuid, group_concat(coalesce(measure, ''),' - ') as response " +
+    "FROM (select * from latestNonDeletedArchentIdentifiers order by case attributename when 'Job Name' then 1 when 'Trench ID' then 2 end ) " +
+    "WHERE aenttypename = 'Trench' " +
+    "GROUP BY uuid " +
+    "order by response;", new FetchCallback() {
+        onFetch(result) {
+            populateList("control/Excavation_Data/TrenchList", result);
+        }
+
+        onError(message) {
+            showToast(message);
+        }
+    });
+    refreshTabgroupCSS("control");
+}
+
+refreshUnitList() {
+  String q = "" +
+    "SELECT uuid, response " +
+    "  FROM latestNonDeletedArchEntFormattedIdentifiers  " +
+    " WHERE uuid in (SELECT uuid " +
+    "                  FROM latestNonDeletedArchEntIdentifiers " +
+    "                 WHERE aenttypename = 'Spit' " +
+    "               )  " +
+    " ORDER BY response ";
+
+  fetchAll(q, new FetchCallback() {
+    onFetch(result) {
+      populateList("control/Units/UnitList", result);
+    }
+    onError(message) {
+      showToast(message);
+    }
+  });
+}
+
+/*** ARCHENT: Trench ***/
+onEvent("Trench", "show", "autosaveTrench();addTrenchNavigation();");
+
+onFocus("Trench/Trench_Info/Trench_ID", null, "activateAutoSaveTrench()");
+
+onEvent("Trench/Trench_Info/Take_GPS", "click", "fillInGPS(\"Trench/Trench_Info/\")");
+onEvent("Trench/Trench_Info/Fill_Slope_Details", "click", "showSlopeTab(false)");
+
+onEvent("Trench/Trench_Info/Take_Photo", "click", "attachPictureTo(\"Trench/Trench_Info/Photos\")");
+onEvent("Trench/Trench_Info/Attach_Sketches", "click", "attachFileTo(\"Trench/Trench_Info/Sketches\")");
+onEvent("Trench/Trench_Info/View_Attached", "click", "viewArchEntAttachedFiles(trench_id)");
+
+onEvent("Trench/Units", "show", "refreshRelatedUnits()");
+onEvent("Trench/Units/New_Unit", "delayclick", "newUnitFromTrench();");
+onEvent("Trench/Units/Unit_List", "click", "loadUnit()");
+
+onEvent("Trench/Spits", "show", "refreshRelatedSpits()");
+onEvent("Trench/Spits/New_Spit", "delayclick", "newSpitFromTrench();");
+onEvent("Trench/Spits/Spit_List", "click", "loadSpit()");
+
+onEvent("Trench/PhotoLog", "show", "loadRelatedPhotologs()");
+onEvent("Trench/PhotoLog/newPhotoLog", "delayclick", "newPhotologFromTrench();");
+onEvent("Trench/PhotoLog/ListPhotoLog", "click", "loadPhotolog();");
+
+onEvent("Trench/Notes", "show", "loadRelatedNotes()");
+onEvent("Trench/Notes/newNote", "delayclick", "newNoteFromTrench();");
+onEvent("Trench/Notes/ListNotes", "click", "loadNote();");
+
+String trench_id = null;
+
+newTrench(Boolean onSaveAndNew) {
+    String job_name;
+    if(!onSaveAndNew) {
+        if(isNull(getFieldValue("control/Excavation_Data/Job_Name"))) {
+            showWarning("Validation Error", "You must fill in the Job Name before you can create a Trench");
+            return;
+        } else {
+            job_name = getFieldValue("control/Excavation_Data/Job_Name");
+        }
+    } else {
+        job_name = getFieldValue("Trench/Trench_Info/Job_Name");
+    }
+    newTabGroup("Trench");
+    trench_id = null;
+    setFieldValue("Trench/Trench_Info/Job_Name", job_name);
+    setFieldValue("Trench/Trench_Info/Author", username);
+    setTimestamp("Trench/hidden/timestamp");
+}
+
+loadTrench() {
+    trench_id = getListItemValue();
+    loadTrenchFrom(trench_id);
+}
+
+loadTrenchFrom(archentid) {
+    if (isNull(archentid)) {
+        showToast("No Trench selected");
+        return;
+    }
+    showTabGroup("Trench", archentid, new FetchCallback() {
+        onFetch(result) {
+            trench_id = archentid;
+            showSlopeTab(true);
+            saveTabGroup("Trench", trench_id, null, null, new SaveCallback() {
+                onSave(uuid, newRecord) {
+                    trench_id = uuid;
+                }
+
+                onError(message) {
+                    showToast(message);
+                }
+            }, true);
+        }
+
+        onError(message) {
+            showToast(message);
+        }
+    });
+}
+
+activateAutoSaveTrench() {
+    if(!isNull(trench_id)) return;
+    if(isNull(getFieldValue("Trench/Trench_Info/Trench_ID"))) return;
+    saveTabGroup("Trench", trench_id, null, null, new SaveCallback() {
+        onSave(uuid, newRecord) {
+            trench_id = uuid;
+            if(newRecord) {
+                setCounters();
+            }
+            saveTabGroup("Trench", trench_id, null, null, new SaveCallback() {
+                onSave(uuid, newRecord) {
+                    trench_id = uuid;
+                }
+
+                onError(message) {
+                    showToast(message);
+                }
+            }, true);
+        }
+
+        onError(message) {
+            showToast(message);
+        }
+    });
+}
+
+autosaveTrench() {
+    if(isNull(trench_id)) return;
+    saveTabGroup("Trench", trench_id, null, null, new SaveCallback() {
+        onSave(uuid, newRecord) {
+            trench_id = uuid;
+        }
+
+        onError(message) {
+            showToast(message);
+        }
+    }, true);
+}
+
+isTrenchSaved() {
+    if(isNull(trench_id)) {
+        if (isNull(getFieldValue("Trench/Trench_Info/Trench_ID"))) {
+            showWarning("Validation Error", "Please enter a Trench ID");
+        } else {
+            showToast("Please wait for this {Trench} to save");
+
+        }
+        return false;
+    }
+    return true;
+}
+
+newUnitFromTrench() {
+    if(isTrenchSaved()) newUnit();
+}
+
+newSpitFromTrench() {
+    if(isTrenchSaved()) newSpit();
+}
+
+newPhotologFromTrench() {
+    if(isTrenchSaved()) newPhotolog();
+}
+
+newNoteFromTrench() {
+    if(isTrenchSaved()) newNote();
+}
+
+setCounters() {
+    fetchOne("REPLACE INTO localSettings(key, value) VALUES('Unit"+ trench_id +"', 1);", null);
+    fetchOne("REPLACE INTO localSettings(key, value) VALUES('Spit"+ trench_id +"', 1);", null); 
+}
+
+deleteTrench() {
+    if (!isNull(trench_id)) {
+        showAlert("Confirm Deletion", "Press OK to Delete this Trench!", "reallyDeleteTrench()", "doNotDelete()");
+    } else {
+        cancelTabGroup("Trench", true);
+    }
+}
+
+reallyDeleteTrench() {
+    deleteArchEnt(trench_id, new DeleteCallback() {
+        onDelete(uuid) {
+            cancelTabGroup("Trench", false);        
+        }
+    });
+}
+
+loadTrenchAttributes() {
+    makeVocab("DropDown", "Trench/Trench_Info/Dimensions", "Dimensions");
+    makeVocab("RadioGroup", "Trench/Trench_Info/Artefacts_Present", "Artefacts Present");
+    makeVocab("CheckBoxGroup", "Trench/Trench_Info/Landform_Genesis", "Landform Genesis");
+    makeVocab("CheckBoxGroup", "Trench/Trench_Info/Landform_Element", "Landform Element");
+    makeVocab("DropDown", "Trench/Trench_Info/Geomorphic_Context", "Geomorphic Context");
+    makeVocab("CheckBoxGroup", "Trench/Trench_Info/Samples_Collected", "Samples Collected");
+    makeVocab("DropDown", "Trench/Slope/Slope_Detail", "Slope Detail");
+    makeVocab("DropDown", "Trench/Slope/Slope_Detail_2", "Slope Detail 2");
+}
+
+addTrenchNavigation() {
+    removeNavigationButton("duplicate");
+    removeNavigationButton("new");
+    removeNavigationButton("close");
+    removeNavigationButton("delete");
+
+    addNavigationButton("duplicate", new ActionButtonCallback() {
+        actionOnLabel() {
+            "Duplicate {Trench}";
+        }
+        actionOn() {
+            if(isTrenchSaved()) {
+                showTabGroup("Trench", trench_id, new FetchCallback() {
+                    onFetch(result) {
+                        trench_id = null;
+                        populateCameraPictureGallery("Trench/Trench_Info/Photos", new ArrayList());
+                        populateFileList("Trench/Trench_Info/Sketches", new ArrayList());
+                        setTimestamp("Trench/hidden/timestamp");
+                        saveTabGroup("Trench", trench_id, null, null, new SaveCallback() {
+                            onSave(uuid, newRecord) {
+                                trench_id = uuid;
+                                if(newRecord) {
+                                    setCounters();
+                                }
+                                saveTabGroup("Trench", trench_id, null, null, new SaveCallback() {
+                                    onSave(uuid, newRecord) {
+                                        trench_id = uuid;
+                                    }
+
+                                    onError(message) {
+                                        showToast(message);
+                                    }
+                                }, true);
+                            }
+
+                            onError(message) {
+                                showToast(message);
+                            }
+                        });
+                    }
+                });
+                
+            }       
+        }
+    }, "success");
+
+    addNavigationButton("new", new ActionButtonCallback() {
+        actionOnLabel() {
+            "New {Trench}";
+        }
+        actionOn() {
+            if(!isNull(trench_id)) {
+                newTrench(true);
+            } else {
+                showAlert("Warning", "You will lose any unsaved changes!", "newTrench(true)", "");
+            }
+        }
+    }, "success");
+
+    addNavigationButton("close", new ActionButtonCallback() {
+        actionOnLabel() {
+            "Close {Trench}";
+        }
+        actionOn() {
+            if(!isNull(trench_id)) {
+                cancelTabGroup("Trench", false);
+            } else {
+                cancelTabGroup("Trench", true);
+            }
+        }
+    }, "success");
+
+    addNavigationButton("delete", new ActionButtonCallback() {
+        actionOnLabel() {
+            "Delete {Trench}";
+        }
+        actionOn() {
+            deleteTrench();
+        }
+    }, "danger");
+}
+
+showSlopeTab(Boolean onLoad) {
+    fetchOne("select vocabid from vocabulary join attributekey using (attributeid) where attributename = 'Landform Element' and vocabname = '{Slope}';", new FetchCallback() {
+        onFetch(result) {
+            for(vocabid : getFieldValue("Trench/Trench_Info/Landform_Element")) {
+                if(vocabid.getName().equals(result.get(0))) {
+                    showTab("Trench/Slope");
+                    if(onLoad) {
+                        showTab("Trench/Trench_Info");
+                    }
+                    return;
+                }
+                if(!onLoad) {
+                    showToast("Slope was not selected in Landform Element");
+                } else {
+                    showTab("Trench/Slope");
+                    cancelTab("Trench/Slope", false);
+                }
+            }
+        }
+
+        onError(message) {
+            showToast(message);
+        }
+    });
+}
+
+refreshRelatedUnits() {
+    if(!isNull(trench_id)) {
+        fetchAll("select uuid, aenttypename || ' ' || group_concat(coalesce(measure || ' ' || vocabname || '(' ||freetext||')',  measure || ' (' || freetext ||')',  vocabname || ' (' || freetext ||')',  measure || ' ' || vocabname ,  vocabname || ' (' || freetext || ')',  measure || ' (' || freetext || ')',  measure,  vocabname,  freetext,  measure,  vocabname,  freetext), ' - ') as response, valuetimestamp\n"+
+            "  FROM (  SELECT uuid, attributeid, vocabid, attributename, vocabname, measure, freetext, certainty, attributetype, valuetimestamp, aenttypename\n"+
+            "            FROM latestNonDeletedArchentIdentifiers\n"+
+            "           WHERE aenttypename = 'Unit'\n"+
+            "             AND uuid in (select uuid\n"+
+            "                            FROM latestNonDeletedAentReln\n"+
+            "                           where relationshipid in (select relationshipid\n"+
+            "                                                      FROM latestNonDeletedAentReln\n"+
+            "                                                      JOIN relationship using (relationshipid)\n"+
+            "                                                      JOIN relntype using (relntypeid)\n"+
+            "                                                    where uuid = "+trench_id+"\n"+
+            "                                                       and relntypeName = 'TrenchUnit')\n"+
+            "                             and uuid != "+trench_id+")\n"+
+            "        ORDER BY uuid, attributename DESC)\n"+
+            "group by uuid\n"+
+            "order by valuetimestamp desc, uuid, attributename;", new FetchCallback() {
+                onFetch(result) {
+                    populateList("Trench/Units/Unit_List", result);
+                }
+
+                onError(message) {
+                    showToast(message);
+                }
+            });
+    } else {
+        populateList("Trench/Units/Unit_List", new ArrayList());
+    }
+    refreshTabgroupCSS("Trench");
+    
+}
+
+refreshRelatedSpits() {
+    if(!isNull(trench_id)) {
+        fetchAll("select uuid, aenttypename || ' ' || group_concat(coalesce(measure || ' ' || vocabname || '(' ||freetext||')',  measure || ' (' || freetext ||')',  vocabname || ' (' || freetext ||')',  measure || ' ' || vocabname ,  vocabname || ' (' || freetext || ')',  measure || ' (' || freetext || ')',  measure,  vocabname,  freetext,  measure,  vocabname,  freetext), ' - ') as response, valuetimestamp\n"+
+            "  FROM (  SELECT uuid, attributeid, vocabid, attributename, vocabname, measure, freetext, certainty, attributetype, valuetimestamp, aenttypename\n"+
+            "            FROM latestNonDeletedArchentIdentifiers\n"+
+            "           WHERE aenttypename = 'Spit'\n"+
+            "             AND uuid in (select uuid\n"+
+            "                            FROM latestNonDeletedAentReln\n"+
+            "                           where relationshipid in (select relationshipid\n"+
+            "                                                      FROM latestNonDeletedAentReln\n"+
+            "                                                      JOIN relationship using (relationshipid)\n"+
+            "                                                      JOIN relntype using (relntypeid)\n"+
+            "                                                    where uuid = "+trench_id+"\n"+
+            "                                                       and relntypeName = 'TrenchSpit')\n"+
+            "                             and uuid != "+trench_id+")\n"+
+            "        ORDER BY uuid, attributename DESC)\n"+
+            "group by uuid\n"+
+            "order by valuetimestamp desc, uuid, attributename;", new FetchCallback() {
+                onFetch(result) {
+                    populateList("Trench/Spits/Spit_List", result);
+                }
+
+                onError(message) {
+                    showToast(message);
+                }
+            });
+    } else {
+        populateList("Trench/Spits/Spit_List", new ArrayList());
+    }
+    refreshTabgroupCSS("Trench");
+}
+
+loadRelatedPhotologs() {
+    if (!isNull(trench_id)) {
+        fetchAll("select uuid, group_concat(coalesce(measure || ' ' || vocabname || '(' ||freetext||')',  measure || ' (' || freetext ||')',  vocabname || ' (' || freetext ||')',  measure || ' ' || vocabname ,  vocabname || ' (' || freetext || ')',  measure || ' (' || freetext || ')',  measure,  vocabname,  freetext,  measure,  vocabname,  freetext), ' - ') as response, valuetimestamp\n"+
+            "  FROM (  SELECT uuid, attributeid, vocabid, attributename, vocabname, measure, freetext, certainty, attributetype, valuetimestamp, aenttypename\n"+
+            "            FROM latestNonDeletedArchentIdentifiers\n"+
+            "           WHERE aenttypename = 'Photograph log'\n"+
+            "             AND uuid in (select uuid\n"+
+            "                            FROM latestNonDeletedAentReln\n"+
+            "                           where relationshipid in (select relationshipid\n"+
+            "                                                      FROM latestNonDeletedAentReln\n"+
+            "                                                      JOIN relationship using (relationshipid)\n"+
+            "                                                      JOIN relntype using (relntypeid)\n"+
+            "                                                     where uuid = "+trench_id+"\n"+
+            "                                                       and relntypeName = 'TrenchPhotographLog')\n"+
+            "                             and uuid != "+trench_id+")\n"+
+            "        ORDER BY uuid, attributename ASC)\n"+
+            "group by uuid\n"+
+            "order by valuetimestamp desc, uuid, attributename;", new FetchCallback() {
+                onFetch(result) {
+                    populateList("Trench/PhotoLog/ListPhotoLog",  result);
+                }
+
+                onError(message) {
+                    showToast(message);
+                }
+            });
+    } else {
+        populateList("Trench/PhotoLog/ListPhotoLog",  new ArrayList());
+    }
+    refreshTabgroupCSS("Trench");
+}
+
+loadRelatedNotes() {
+    if (!isNull(trench_id)) {
+        fetchAll("select uuid, group_concat(coalesce(measure || ' ' || vocabname || '(' ||freetext||')',  measure || ' (' || freetext ||')',  vocabname || ' (' || freetext ||')',  measure || ' ' || vocabname ,  vocabname || ' (' || freetext || ')',  measure || ' (' || freetext || ')',  measure,  vocabname,  freetext,  measure,  vocabname,  freetext), ' - ') as response, valuetimestamp\n"+
+            "  FROM (  SELECT uuid, attributeid, vocabid, attributename, vocabname, measure, freetext, certainty, attributetype, valuetimestamp, aenttypename\n"+
+            "            FROM latestNonDeletedArchentIdentifiers\n"+
+            "           WHERE aenttypename = 'Notes'\n"+
+            "             AND uuid in (select uuid\n"+
+            "                            FROM latestNonDeletedAentReln\n"+
+            "                           where relationshipid in (select relationshipid\n"+
+            "                                                      FROM latestNonDeletedAentReln\n"+
+            "                                                      JOIN relationship using (relationshipid)\n"+
+            "                                                      JOIN relntype using (relntypeid)\n"+
+            "                                                     where uuid = "+trench_id+"\n"+
+            "                                                       and relntypeName = 'TrenchNote')\n"+
+            "                             and uuid != "+trench_id+")\n"+
+            "        ORDER BY uuid, attributename ASC)\n"+
+            "group by uuid\n"+
+            "order by valuetimestamp desc, uuid, attributename;", new FetchCallback() {
+                onFetch(result) {
+                    populateList("Trench/Notes/ListNotes", result);
+                }
+
+                onError(message) {
+                    showToast(message);
+                }
+            });
+    } else {
+        populateList("Trench/Notes/ListNotes", new ArrayList());
+    }
+    refreshTabgroupCSS("Trench");
+}
+
+/*** ARCHENT: Unit ***/
+onEvent("Unit", "show", "addUnitNavigation();");
+
+onEvent("Unit", "show", "activateAutoSaveUnit();");
+onEvent("Unit", "show", "activateAutoSaveUnit();");
+
+onEvent("Unit/Soil/Fill_Grass_Roots_Details", "click", "showGrassRootsTab(false)");
+
+String unit_id = null;
+
+newUnit() {
+    if(isNull(trench_id)) {
+        showToast("You cannot create new Unit from control menu.");
+        goBack();
+        return;
+    }
+    onEvent("Unit", "show", "showTab(\"Unit/Grass_Roots\");cancelTab(\"Unit/Grass_Roots\", false);");
+    newTabGroup("Unit");
+    unit_id = null;
+    setFieldValue("Unit/Soil/Job_Name", getFieldValue("Trench/Trench_Info/Job_Name"));
+    setFieldValue("Unit/Soil/Trench_ID", getFieldValue("Trench/Trench_Info/Trench_ID"));
+    setFieldValue("Unit/Soil/Author", username);
+    autoNumUnit(null);
+}
+
+loadUnit() {
+    unit_id = getListItemValue();
+    loadUnitFrom(unit_id);
+}
+
+loadUnitFrom(archentid) {
+    if (isNull(archentid)) {
+        showToast("No Unit selected");
+        return;
+    }
+    showTabGroup("Unit", unit_id, new FetchCallback() {
+        onFetch(result) {
+            unit_id = archentid;
+            showGrassRootsTab(true);
+            saveTabGroup("Unit", unit_id, null, null, new SaveCallback() {
+                onSave(uuid, newRecord) {
+                    unit_id = uuid;
+                    updateUnitCounter(null);
+                }
+
+                onError(message) {
+                    showToast(message);
+                }
+            }, true);
+        }
+
+        onError(message) {
+            showToast(message);
+        }
+    });
+}
+
+activateAutoSaveUnit() {
+    saveTabGroup("Unit", unit_id, null, null, new SaveCallback() {
+        onSave(uuid, newRecord) {
+            unit_id = uuid;
+            if(newRecord) {
+                saveEntitiesToRel("TrenchUnit", trench_id, unit_id);
+            }
+            updateUnitCounter(null);
+            saveTabGroup("Unit", unit_id, null, null, new SaveCallback() {
+                onSave(uuid, newRecord) {
+                    unit_id = uuid;
+                    updateUnitCounter(null);
+                }
+
+                onError(message) {
+                    showToast(message);
+                }
+            }, true);
+        }
+
+        onError(message) {
+            showToast(message);
+        }
+    });
+}
+
+isUnitSaved() {
+    if(isNull(unit_id)) {
+        if(isNull(getFieldValue("Unit/Soil/Unit_ID")) || isNull(getFieldValue("Unit/Soil/Horizon"))) {
+            showWarning("Validation Error", "Please enter a Unit ID and Horizon");
+        } else {
+            showToast("Please wait for this {Unit} to save");
+        }
+        return false;
+    }
+    return true;
+}
+
+deleteUnit() {
+    if (!isNull(unit_id)) {
+        showAlert("Confirm Deletion", "Press OK to Delete this Unit!", "reallyDeleteUnit()", "doNotDelete()");
+    } else {
+        cancelTabGroup("Unit", false);
+        if(!isNull(trench_id)) {
+            showTab("Trench/Units");
+        } else {
+            showTab("control/Units");
+        }
+    }
+}
+
+reallyDeleteUnit() {
+    deleteArchEnt(unit_id, new DeleteCallback() {
+        onDelete(uuid) {
+            cancelTabGroup("Unit", false);
+            if(!isNull(trench_id)) {
+                showTab("Trench/Units");
+            } else {
+                showTab("control/Units");
+            }        
+        }
+    });
+}
+
+loadUnitAttributes() {
+    populateHierarchicalDropDown("Unit/Soil/Texture", "Texture");
+    makeVocab("DropDown", "Unit/Soil/Moisture", "Moisture");
+    makeVocab("DropDown", "Unit/Soil/Grain_size", "Grain size");
+    makeVocab("DropDown", "Unit/Soil/Consistency", "Consistency");
+    makeVocab("DropDown", "Unit/Soil/Cementation", "Cementation");
+    makeVocab("CheckBoxGroup", "Unit/Soil/Inclusions", "Inclusions");
+    makeVocab("CheckBoxGroup", "Unit/Soil/Disturbance", "Disturbance");
+    makeVocab("RadioGroup", "Unit/Soil/Artefacts", "Artefacts");
+    makeVocab("DropDown", "Unit/Grass_Roots/Root_Size", "Root Size");
+    makeVocab("DropDown", "Unit/Grass_Roots/Root_Abundance", "Root Abundance");
+}
+
+addUnitNavigation() {
+    removeNavigationButton("duplicate");
+    removeNavigationButton("new");
+    removeNavigationButton("close");
+    removeNavigationButton("delete");
+
+    addNavigationButton("duplicate", new ActionButtonCallback() {
+        actionOnLabel() {
+            "Duplicate {Unit}";
+        }
+        actionOn() {
+            if(isUnitSaved()) {
+                showTabGroup("Unit", unit_id, new FetchCallback() {
+                    onFetch(result) {
+                        unit_id = null;
+                        autoNumUnit(new Callable() {
+                            call() {
+                                saveTabGroup("Unit", unit_id, null, null, new SaveCallback() {
+                                    onSave(uuid, newRecord) {
+                                        unit_id = uuid;
+                                        if(newRecord) {
+                                            saveEntitiesToRel("TrenchUnit", trench_id, unit_id);
+                                        }
+                                        updateUnitCounter(null);
+                                        saveTabGroup("Unit", unit_id, null, null, new SaveCallback() {
+                                            onSave(uuid, newRecord) {
+                                                unit_id = uuid;
+                                                updateUnitCounter(null);
+                                            }
+
+                                            onError(message) {
+                                                showToast(message);
+                                            }
+                                        }, true);
+                                    }
+
+                                    onError(message) {
+                                        showToast(message);
+                                    }
+                                });        
+                            }
+                        });
+                    }
+                });   
+            }
+        }
+    }, "success");
+
+    addNavigationButton("new", new ActionButtonCallback() {
+        actionOnLabel() {
+            "New {Unit}";
+        }
+        actionOn() {
+            if(!isNull(unit_id)) {
+                newUnit();
+            } else {
+                showAlert("Warning", "You will lose any unsaved changes!", "newUnit();", "");
+            }
+        }
+    }, "success");
+
+    addNavigationButton("close", new ActionButtonCallback() {
+        actionOnLabel() {
+            "Close {Unit}";
+        }
+        actionOn() {
+            if(!isNull(unit_id)) {
+                cancelTabGroup("Unit", false);
+                showTab("Trench/Units");
+            } else {
+                cancelTabGroup("Unit", true);
+            }
+        }
+    }, "success");
+
+    addNavigationButton("delete", new ActionButtonCallback() {
+        actionOnLabel() {
+            "Delete {Unit}";
+        }
+        actionOn() {
+            deleteUnit();
+        }
+    }, "danger");
+}
+
+autoNumUnit(Callable callback) {
+    fetchOne("select value from localSettings where key = 'Unit"+ trench_id +"';", new FetchCallback() {
+        onFetch(result) {
+            setFieldValue("Unit/Soil/Unit_ID", result.get(0));
+            if(callback != null) callback.call();
+        }
+
+        onError(message) {
+            showToast(message);
+        }
+    });
+}
+
+updateUnitCounter(Callable callback) {
+    fetchOne("select value from localSettings where key = 'Unit"+ trench_id +"';", new FetchCallback() {
+        onFetch(result) {
+            next_unit_id = result.get(0);
+            try {
+                if(Integer.parseInt(getFieldValue("Unit/Soil/Unit_ID")) >= Integer.parseInt(next_unit_id)) {
+                    fetchOne("REPLACE INTO localSettings(key, value) VALUES('Unit"+ trench_id +"', "+ getFieldValue("Unit/Soil/Unit_ID") +"+1);", new FetchCallback() {
+                        onFetch(result) {
+                            if(callback != null) callback.call();
+                        }
+
+                        onError(message) {
+                            showToast(message);
+                        }
+                    });
+                } else {
+                    fetchOne("REPLACE INTO localSettings(key, value) VALUES('Unit"+ trench_id +"', "+ next_unit_id +");", new FetchCallback() {
+                        onFetch(result) {
+                            if(callback != null) callback.call();
+                        }
+
+                        onError(message) {
+                            showToast(message);
+                        }
+                    });
+                }
+            } catch (NumberFormatException e) {
+                return;
+            }
+        }
+
+        onError(message) {
+            showToast(message);
+        }
+
+        onError(message) {
+            showToast(message);
+        }
+
+        onError(message) {
+            showToast(message);
+        }
+    });
+}
+
+showGrassRootsTab(Boolean onLoad) {
+    fetchOne("select vocabid from vocabulary join attributekey using (attributeid) where attributename = 'Inclusions' and vocabname = '{Grass_roots}';", new FetchCallback() {
+        onFetch(result) {
+            for(vocabid : getFieldValue("Unit/Soil/Inclusions")) {
+                if(vocabid.getName().equals(result.get(0))) {
+                    showTab("Unit/Grass_Roots");
+                    if(onLoad) {
+                        showTab("Unit/Soil");
+                    }
+                    return;
+                }
+                if(!onLoad) {
+                    showToast("Grass Roots was not selected in Inclusions");
+                } else {
+                    showTab("Unit/Grass_Roots");
+                    cancelTab("Unit/Grass_Roots", false);
+                }
+            }
+        }
+
+        onError(message) {
+            showToast(message);
+        }
+    });
+}
+
+/*** ARCHENT: Spit ***/
+onEvent("Spit", "show", "addSpitNavigation();");
+onEvent("Spit/Spit_Info/Button_Photo", "click", "attachPictureTo(\"Spit/Spit_Info/Photo\")");
+
+String spit_id = null;
+
+newSpit() {
+    newTabGroup("Spit");
+    spit_id = null;
+    setFieldValue("Spit/Spit_Info/Job_Name", getFieldValue("Trench/Trench_Info/Job_Name"));
+    setFieldValue("Spit/Spit_Info/Trench_ID", getFieldValue("Trench/Trench_Info/Trench_ID"));
+    setFieldValue("Spit/Spit_Info/Author", username);
+    autoNumSpit();
+}
+
+loadSpit() {
+    spit_id = getListItemValue();
+    loadSpitFrom(spit_id);
+}
+
+loadSpitFrom(archentid) {    
+    if (isNull(archentid)) {
+        showToast("No Spit selected");
+        return;
+    }
+    showTabGroup("Spit", archentid, new FetchCallback() {
+        onFetch(result) {
+            spit_id = archentid;
+            saveTabGroup("Spit", spit_id, null, null, new SaveCallback() {
+                onSave(uuid, newRecord) {
+                    spit_id = uuid;
+                    updateSpitCounter(null);
+                }
+
+                onError(message) {
+                    showToast(message);
+                }
+            }, true);
+        }
+
+        onError(message) {
+            showToast(message);
+        }
+    });
+}
+
+isSpitSaved() {
+    if(isNull(spit_id)) {
+        if (isNull(getFieldValue("Spit/Spit_Info/Spit_ID"))) {
+            showWarning("Validation Error", "Please enter a Spit ID");
+            return;
+        }else {
+            showToast("Please wait for this {Spit} to save");
+        }
+        return false;
+    }
+    return true;
+}
+
+saveSpit(Callable callback) {
+    dialog = showBusy("Saving {Spit}", "Please wait.");
+    saveTabGroup("Spit", spit_id, null, null, new SaveCallback() {
+        onSave(uuid, newRecord) {
+            spit_id = uuid;
+            if(newRecord) {
+                saveEntitiesToRel("TrenchSpit", trench_id, spit_id);
+            }
+            dialog.dismiss();
+            updateSpitCounter(callback);
+        }
+
+        onError(message) {
+            showToast(message);
+        }
+    });
+}
+
+deleteSpit() {
+    if (!isNull(spit_id)) {
+        showAlert("Confirm Deletion", "Press OK to Delete this Spit!", "reallyDeleteSpit()", "doNotDelete()");
+    } else {
+        cancelTabGroup("Spit", false);
+        showTab("Trench/Spits");
+    }
+}
+
+reallyDeleteSpit() {
+    deleteArchEnt(spit_id, new DeleteCallback() {
+        onDelete(uuid) {
+            cancelTabGroup("Spit", false);
+            showTab("Trench/Spits");        
+        }
+    });
+}
+
+addSpitNavigation() {
+    removeNavigationButton("duplicate");
+    removeNavigationButton("new");
+    removeNavigationButton("close");
+    removeNavigationButton("delete");
+
+    addNavigationButton("duplicate", new ActionButtonCallback() {
+        actionOnLabel() {
+            "Duplicate {Spit}";
+        }
+        actionOn() {
+            if(isSpitSaved()) {
+                showTabGroup("Spit", spit_id, new FetchCallback() {
+                    onFetch(result) {
+                        spit_id = null;
+                        autoNumSpit();
+                    }
+                });
+            }
+        }
+    }, "success");
+
+    addNavigationButton("new", new ActionButtonCallback() {
+        actionOnLabel() {
+            "New {Spit}";
+        }
+        actionOn() {
+            if(!isNull(spit_id)) {
+                newSpit();
+            } else {
+                showAlert("Warning", "You will lose any unsaved changes!", "newSpit();", "");
+            }
+            
+        }
+    }, "success");
+
+    addNavigationButton("close", new ActionButtonCallback() {
+        actionOnLabel() {
+            "Close {Spit}";
+        }
+        actionOn() {
+            if(!isNull(spit_id)) {
+                cancelTabGroup("Spit", false);
+                showTab("Trench/Spits");
+            } else {
+                cancelTabGroup("Spit", true);
+            }
+        }
+    }, "success");
+
+    addNavigationButton("delete", new ActionButtonCallback() {
+        actionOnLabel() {
+            "Delete {Spit}";
+        }
+        actionOn() {
+            deleteSpit();
+        }
+    }, "danger");
+}
+
+autoNumSpit() {
+    fetchOne("select value from localSettings where key = 'Spit"+ trench_id +"';", new FetchCallback() {
+        onFetch(result) {
+            setFieldValue("Spit/Spit_Info/Spit_ID", result.get(0));
+            saveSpit(new Callable() {
+                call() {
+                    saveTabGroup("Spit", spit_id, null, null, new SaveCallback() {
+                        onSave(uuid, newRecord) {
+                            spit_id = uuid;
+                            updateSpitCounter(null);
+                        }
+
+                        onError(message) {
+                            showToast(message);
+                        }
+                    }, true);
+                }
+            });
+        }
+
+        onError(message) {
+            showToast(message);
+        }
+    });
+}
+
+updateSpitCounter(Callable callback) {
+    fetchOne("select value from localSettings where key = 'Spit"+ trench_id +"';", new FetchCallback() {
+        onFetch(result) {
+            next_spit_id = result.get(0);
+            try {
+                if(Integer.parseInt(getFieldValue("Spit/Spit_Info/Spit_ID")) >= Integer.parseInt(next_spit_id)) {
+                    fetchOne("REPLACE INTO localSettings(key, value) VALUES('Spit"+ trench_id +"', "+ getFieldValue("Spit/Spit_Info/Spit_ID") +"+1);", new FetchCallback() {
+                        onFetch(result) {
+                            if(callback != null) callback.call();
+                        }
+
+                        onError(message) {
+                            showToast(message);
+                        }
+                    });
+                } else {
+                    fetchOne("REPLACE INTO localSettings(key, value) VALUES('Spit"+ trench_id +"', "+ next_spit_id +");", new FetchCallback() {
+                        onFetch(result) {
+                            if(callback != null) callback.call();
+                        }
+
+                        onError(message) {
+                            showToast(message);
+                        }
+                    });
+                }    
+            } catch(NumberFormatException e) {
+                return;
+            }
+        }
+
+        onError(message) {
+            showToast(message);
+        }
+    });
+}
+
+/*** Artefact Stuff ***/
+onEvent("Artefact", "show", "activateAutoSaveArtefact();");
+
+loadArtefactAttributes() {
+  makeVocab("HierarchicalDropDown", "Artefact/Artefact/Artefact_Class", "Artefact Class");
+}
+
+activateAutoSaveArtefact() {
+    saveTabGroup("Artefact", artefact_id, null, null, new SaveCallback() {
+        onSave(uuid, newRecord) {
+            artefact_id = uuid;
+        }
+        onError(message) {
+            showToast(message);
+        }
+    }, true);
+}
+
+onShowArtefact () {
+  // TODO: Add some things which should happen when this tabgroup is shown
+  saveTabGroup("Artefact", "onSaveArtefact__()");
+}
+
+addOnEvent("Spit", "show", "onShowSpit()");
+addOnEvent("Artefact", "show", "onShowArtefact()");
+
+onClickSpitNewArtefact () {
+  // TODO: Add some things which should happen when this element is clicked
+  String tabgroup = "Spit";
+  if (isNull(getUuid(tabgroup))){
+    showToast("{You_must_save_this_tabgroup_first}");
+    return;
+  }
+  parentTabgroup   = tabgroup;
+  parentTabgroup__ = tabgroup;
+  newArtefact();
+}
+
+addOnEvent("Spit/Spit/New_Artefact", "click", "onClickSpitNewArtefact()");
+
+newArtefact(){
+  String tabgroup = "Artefact";
+
+
+  setUuid(tabgroup, null);
+  newTabGroup(tabgroup);
+  populateAuthorAndTimestamp(tabgroup);
+  populateEntityListsInTabGroup(tabgroup);
+  onCreateArtefact__();
+
+  // WARNING: The default behaviour of calling `onCreateArtefact()` upon entity creation is deprecated in this version of FAIMS Tools. If you never implemented this function, this warning can safely be ignored.
+}
+
+
+onCreateArtefact__(){
+  String ref      = "Artefact";
+  String event    = "create";
+  String stmtsStr = getStatementsString(ref, event);
+  execute(stmtsStr);
+}
+
+
+
+// Triggered after an existing record is loaded.
+onFetchArtefact__(){
+  String ref      = "Artefact";
+  String event    = "fetch";
+  String stmtsStr = getStatementsString(ref, event);
+  execute(stmtsStr);
+}
+
+
+
+// Triggered after an existing record is saved.
+onSaveArtefact__(){
+  String ref      = "Artefact";
+  String event    = "save";
+  String stmtsStr = getStatementsString(ref, event);
+  execute(stmtsStr);
+}
+
+duplicateArtefact(){
+  String tabgroup = "Artefact";
+  String uuidOld = getUuid(tabgroup);
+
+  disableAutoSave(tabgroup);
+
+
+  clearGpsInTabGroup(tabgroup);
+
+
+
+  saveCallback = new SaveCallback() {
+    onSave(uuid, newRecord) {
+      setUuid(tabgroup, uuid);
+      populateAuthorAndTimestamp(tabgroup);
+
+      Boolean enable_autosave = true;
+
+      fetchAll(getDuplicateRelnQuery(uuidOld), new FetchCallback(){
+        onFetch(result) {
+          Log.e("Module", result.toString());
+          makeDuplicateRelationships(result, getUuid(tabgroup));
+          showToast("{Duplicated_record}");
+          dialog.dismiss();
+        }
+      });
+
+      saveTabGroup(tabgroup, getUuid(tabgroup), null, null, new SaveCallback(){
+        onSave(autosaveUuid, autosaveNewRecord) {
+          setUuid(tabgroup, autosaveUuid);
+        }
+      }, enable_autosave);
+    }
+  };
+
+  String extraDupeAttributes = "";
+  fetchAll(getDuplicateAttributeQuery(getUuid(tabgroup), extraDupeAttributes), new FetchCallback(){
+    onFetch(result) {
+      excludeAttributes = new ArrayList();
+
+      duplicateTabGroup(tabgroup, null, getExtraAttributes(result), excludeAttributes, saveCallback);
+    }
+  });
+}
+
+deleteArtefact(){
+  String tabgroup = "Artefact";
+
+  if (isNull(getUuid(tabgroup))) {
+    cancelTabGroup(tabgroup, true);
+  } else {
+    showAlert("{Confirm_Deletion}", "{Press_OK_to_Delete_this_Record}", "reallyDeleteArtefact()", "doNotDelete()");
+  }
+}
+
+reallyDeleteArtefact(){
+  String tabgroup = "Artefact";
+  deleteArchEnt(getUuid(tabgroup));
+  cancelTabGroup(tabgroup, false);
+}
+
+
+doNotDelete(){
+  showToast("{Delete_Cancelled}");
+}
+addOnEvent("Spit", "show", "addNavigationButtons(\"Spit\")");
+addOnEvent("Artefact", "show", "addNavigationButtons(\"Artefact\")");
+
+
+/*** Photolog Stuff ***/
+onEvent("Photograph_log", "show", "addPhotologNavigation();");
+onFocus("Photograph_log/Photograph_log/Photograph_reference_ID", null, "activateAutoSavePhotolog();");
+
+String photolog_id;
+
+newPhotolog() {
+    newTabGroup("Photograph_log");
+    photolog_id = null;
+    setFieldValue("Photograph_log/Photograph_log/Created_By", username);
+    setFieldValue("Photograph_log/Photograph_log/Trench_ID", getFieldValue("Trench/Trench_Info/Trench_ID"));
+    setFieldValue("Photograph_log/Photograph_log/Job_Name", getFieldValue("Trench/Trench_Info/Job_Name"));
+    setTimestamp("Photograph_log/Photograph_log/Creation_Date");
+}
+
+loadPhotolog() {
+    archent_id = getListItemValue();
+    loadPhotologFrom(archent_id);
+}
+
+loadPhotologFrom(archent_id) {
+    if (isNull(archent_id)) {
+        showToast("No record selected");
+        return;
+    }
+    showTabGroup("Photograph_log", archent_id, new FetchCallback() {
+        onFetch(result) {
+            photolog_id = archent_id;
+            saveTabGroup("Photograph_log", photolog_id, null, null, new SaveCallback() {
+                onSave(uuid, newRecord) {
+                    photolog_id = uuid;
+                }
+
+                onError(message) {
+                    showToast(message);
+                }
+            }, true);
+
+        }
+
+        onError(message) {
+            showToast(message);
+        }
+    });
+}
+
+activateAutoSavePhotolog() {
+    if(!isNull(photolog_id)) return;
+    if (isNull(getFieldValue("Photograph_log/Photograph_log/Photograph_reference_ID"))) return;
+    saveTabGroup("Photograph_log", photolog_id, null, null, new SaveCallback() {
+        onSave(uuid, newRecord) {
+            photolog_id = uuid;
+            if(newRecord) {
+                saveEntitiesToRel("TrenchPhotographLog", trench_id, photolog_id);    
+            }
+            saveTabGroup("Photograph_log", photolog_id, null, null, new SaveCallback() {
+                onSave(uuid, newRecord) {
+                    photolog_id = uuid;
+                }
+
+                onError(message) {
+                    showToast(message);
+                }
+            }, true);
+        }
+
+        onError(message) {
+            showToast(message);
+        }
+    });
+}
+
+isPhotologSaved() {
+    if(isNull(photolog_id)) {
+        if (isNull(getFieldValue("Photograph_log/Photograph_log/Photograph_reference_ID"))) {
+            showWarning("Validation Error", "Please enter a Photograph Log ID");
+        } else {
+            showToast("Please wait for this {Photograph_Log} to save");
+        }
+        return false;
+    }
+    return true;
+}
+
+deletePhotolog() {
+    if (!isNull(photolog_id)) {
+        showAlert("Confirm Deletion", "Press OK to Delete this Photolog Record!", "reallyDeletePhotolog()", "doNotDelete()");
+    } else {
+        cancelTabGroup("Photograph_log", false);
+        showTab("Trench/PhotoLog");
+    }
+}
+
+reallyDeletePhotolog() {
+    deleteArchEnt(photolog_id, new DeleteCallback() {
+        onDelete(uuid) {
+            cancelTabGroup("Photograph_log", false);
+            showTab("Trench/PhotoLog");   
+        }
+    });
+}
+
+addPhotologNavigation() {
+    removeNavigationButton("duplicate");
+    removeNavigationButton("new");
+    removeNavigationButton("close");
+    removeNavigationButton("delete");
+
+    addNavigationButton("duplicate", new ActionButtonCallback() {
+        actionOnLabel() {
+            "Duplicate {Photograph_Log}";
+        }
+        actionOn() {
+            if(isPhotologSaved()) {
+                showTabGroup("Photograph_log", photolog_id, new FetchCallback() {
+                    onFetch(result) {
+                        photolog_id = null;
+                        setTimestamp("Photograph_log/Photograph_log/Creation_Date");
+                        saveTabGroup("Photograph_log", photolog_id, null, null, new SaveCallback() {
+                            onSave(uuid, newRecord) {
+                                photolog_id = uuid;
+                                if(newRecord) {
+                                    saveEntitiesToRel("TrenchPhotographLog", trench_id, photolog_id);    
+                                }
+                                saveTabGroup("Photograph_log", photolog_id, null, null, new SaveCallback() {
+                                    onSave(uuid, newRecord) {
+                                        photolog_id = uuid;
+                                    }
+
+                                    onError(message) {
+                                        showToast(message);
+                                    }
+                                }, true);
+                            }
+
+                            onError(message) {
+                                showToast(message);
+                            }
+                        });
+                    }
+                });
+            }
+        }
+    }, "success");
+
+    addNavigationButton("new", new ActionButtonCallback() {
+        actionOnLabel() {
+            "New {Photograph_Log}";
+        }
+        actionOn() {
+            if(!isNull(photolog_id)) {
+                newPhotolog();
+            } else {
+                showAlert("Warning", "You will lose any unsaved changes!", "newPhotolog();", "");
+            }
+        }
+    }, "success");
+
+    addNavigationButton("close", new ActionButtonCallback() {
+        actionOnLabel() {
+            "Close {Photograph_Log}";
+        }
+        actionOn() {
+            if(!isNull(photolog_id)) {
+                cancelTabGroup("Photograph_log", false);
+                showTab("Trench/PhotoLog");
+            } else {
+                cancelTabGroup("Photograph_log", true);
+            }
+
+        }
+    }, "success");
+
+    addNavigationButton("delete", new ActionButtonCallback() {
+        actionOnLabel() {
+            "Delete {Photograph_Log}";
+        }
+        actionOn() {
+            deletePhotolog();
+        }
+    }, "danger");    
+}
+
+/*** Note Stuff ***/
+onEvent("Notes", "show", "addNoteNavigation();");
+onFocus("Notes/Notes/Note_Label", null, "activateAutoSaveNote();");
+
+String note_id;
+
+newNote() {
+    newTabGroup("Notes");
+    note_id = null;
+    setFieldValue("Notes/Notes/Created_By", username);
+    setFieldValue("Notes/Notes/Trench_ID", getFieldValue("Trench/Trench_Info/Trench_ID"));
+    setFieldValue("Notes/Notes/Job_Name", getFieldValue("Trench/Trench_Info/Job_Name"));
+    setTimestamp("Notes/Notes/Creation_Date");
+}
+
+loadNote() {
+    archent_id = getListItemValue();
+    loadNoteFrom(archent_id);
+}
+
+loadNoteFrom(archent_id) {
+    if (isNull(archent_id)) {
+        showToast("No record selected");
+        return;
+    }
+    showTabGroup("Notes", archent_id, new FetchCallback() {
+        onFetch(result) {
+            note_id = archent_id;
+            saveTabGroup("Notes", note_id, null, null, new SaveCallback() {
+                onSave(uuid, newRecord) {
+                    note_id = uuid;
+                } 
+
+                onError(message) {
+                    showToast(message);
+                }
+            }, true);
+        }
+
+        onError(message) {
+            showToast(message);
+        }
+    });
+    
+}
+
+activateAutoSaveNote() {
+    if(!isNull(note_id)) return;
+    if (isNull(getFieldValue("Notes/Notes/Note_Label"))) return;
+    saveTabGroup("Notes", note_id, null, null, new SaveCallback() {
+        onSave(uuid, newRecord) {
+            note_id = uuid;
+            if(newRecord) {
+                saveEntitiesToRel("TrenchNote", trench_id, note_id);    
+            }
+            saveTabGroup("Notes", note_id, null, null, new SaveCallback() {
+                onSave(uuid, newRecord) {
+                    note_id = uuid;
+                }
+
+                onError(message) {
+                    showToast(message);
+                }
+            }, true);
+
+        }
+
+        onError(message) {
+            showToast(message);
+        }
+    });
+}
+
+isNoteSaved() {
+    if(isNull(note_id)) {
+        if (isNull(getFieldValue("Notes/Notes/Note_Label"))) {
+            showWarning("Validation Error", "Cannot save Note without Note Label");
+        } else {
+            showToast("Please wait for this {Note} to save");
+        }
+        return false;
+    }
+    return true;
+}
+
+deleteNote() {
+    if (!isNull(note_id)) {
+        showAlert("Confirm Deletion", "Press OK to Delete this Note Record!", "reallyDeleteNote()", "doNotDelete()");
+    } else {
+        cancelTabGroup("Notes", false);
+        showTab("Trench/Notes");
+    }
+}
+
+reallyDeleteNote() {
+    deleteArchEnt(note_id, new DeleteCallback() {
+        onDelete(uuid) {
+            cancelTabGroup("Notes", false);
+            showTab("Trench/Notes");
+        }    
+    });
+}
+
+addNoteNavigation() {
+    removeNavigationButton("duplicate");
+    removeNavigationButton("new");
+    removeNavigationButton("close");
+    removeNavigationButton("delete");
+
+    addNavigationButton("duplicate", new ActionButtonCallback() {
+        actionOnLabel() {
+            "Duplicate {Note}";
+        }
+        actionOn() {
+            if(isNoteSaved()) {
+                showTabGroup("Notes", note_id, new FetchCallback() {
+                    onFetch(result) {
+                        note_id = null;
+                        setTimestamp("Notes/Notes/Creation_Date");
+                        saveTabGroup("Notes", note_id, null, null, new SaveCallback() {
+                            onSave(uuid, newRecord) {
+                                note_id = uuid;
+                                if(newRecord) {
+                                    saveEntitiesToRel("TrenchNote", trench_id, note_id);    
+                                }
+                                saveTabGroup("Notes", note_id, null, null, new SaveCallback() {
+                                    onSave(uuid, newRecord) {
+                                        note_id = uuid;
+                                    }
+
+                                    onError(message) {
+                                        showToast(message);
+                                    }
+                                }, true);
+                            }
+
+                            onError(message) {
+                                showToast(message);
+                            }
+                        });
+                    }
+                });
+            }
+        }
+    }, "success");
+
+    addNavigationButton("new", new ActionButtonCallback() {
+        actionOnLabel() {
+            "New {Note}";
+        }
+        actionOn() {
+            if(!isNull(note_id)) {
+                newNote();
+            } else {
+                showAlert("Warning", "You will lose any unsaved changes!", "newNote();", "");
+            }
+        }
+    }, "success");
+
+    addNavigationButton("close", new ActionButtonCallback() {
+        actionOnLabel() {
+            "Close {Note}";
+        }
+        actionOn() {
+            if(!isNull(note_id)) {
+                cancelTabGroup("Notes", false);
+                showTab("Trench/Notes");
+            } else {
+                cancelTabGroup("Notes", true);
+            }
+        }
+    }, "success");
+
+    addNavigationButton("delete", new ActionButtonCallback() {
+        actionOnLabel() {
+            "Delete {Note}";
+        }
+        actionOn() {
+            deleteNote();
+        }
+    }, "danger");
+}
+
+/*** MISC ***/
+
+saveEntitiesToRel(String type, String entity1, String entity2) {
+    if (isNull(entity1) || isNull(entity2)) return;
+    saveRel(null, type, null, null, new SaveCallback() {
+        onSave(rel_id, newRecord) {
+            addReln(entity1, rel_id, null);
+            addReln(entity2, rel_id, null);
+        }
+    });
+}
+
+makeVocab(String type, String path, String attrib) {
+    fetchAll("select vocabid, vocabname from vocabulary join attributekey using (attributeid) where attributename = '"+attrib+"' order by vocabcountorder",
+        new FetchCallback() {
+            onFetch(result) {
+                if(type.equals("CheckBoxGroup")) {
+                    populateCheckBoxGroup(path, result);
+                } else if(type.equals("DropDown")) {
+                    populateDropDown(path, result);
+                } else if(type.equals("RadioGroup")) {
+                    populateRadioGroup(path, result);
+                } else if(type.equals("List")) {
+                    populateList(path, result);
+                }
+            }
+        });
+}
+
+setTimestamp(String path) {
+    setFieldValue(path, new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss z").format(new Date()));
+}
+
+doNotDelete() {
+    showToast("Delete Cancelled.");
+}
+
+fillInGPS(String path) {
+    Object position = getGPSPosition();    
+    Object projPosition = getGPSPositionProjected();
+    if (projPosition != null ) {
+        Double latitude = position.getLatitude();
+        Double longitude = position.getLongitude();
+        Double northing = projPosition.getLatitude();
+        Double easting = projPosition.getLongitude();
+        setFieldValue(path+"Latitude", latitude);
+        setFieldValue(path+"Longitude", longitude);
+        setFieldValue(path+"Northing", northing);
+        setFieldValue(path+"Easting", easting);
+    } else {
+        showToast("GPS Not initialized");
+    }
+}
+
+//Checking they have the correct projection EPSG:28355: GDA94 / MGA zone 55
+
+checkProjection() {
+     showWarning("Projection Alert","You are using projection EPSG " + getModuleSrid() + ". To change the projection, do the following:\n1. Log into the FAIMS Web Server.\n2. Open this module.\n3. Click edit module.\n4. Change the value in the \"Module SRID:\" to a projection of your choice.");
+}
+
+checkProjection();
+
+/*** USER ***/
+onEvent("user/usertab/users", "click", "login()");
+
+loadUsers() {
+    fetchAll("select userid, fname || ' ' || lname from user", new FetchCallback() {
+        onFetch(result) {
+            populateList("user/usertab/users", result);
+        }
+    });
+}
+
+loadUsers();
+
+String username = "";
+String device = "";
+
+login() {
+    fetchOne("select userid,fname,lname,email from user where userid='" + getListItemValue() + "';", new FetchCallback() {
+        onFetch(result) {
+            user = new User(result.get(0),result.get(1),result.get(2),result.get(3));
+            setUser(user);
+            username = result.get(1) + " " + result.get(2);
+            showTabGroup("control");
+        }
+    });
+}
+
+loadTrenchAttributes();
+loadUnitAttributes();
+loadArtefactAttributes();
