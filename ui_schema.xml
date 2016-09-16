@@ -36,6 +36,18 @@
             <Units>
               <UnitList/>
             </Units>
+            <Search>
+              <Colgroup_0>
+                <Col_0>
+                  <Search_Term/>
+                </Col_0>
+                <Col_1>
+                  <Search_Button/>
+                </Col_1>
+              </Colgroup_0>
+              <Entity_Types/>
+              <Entity_List/>
+            </Search>
           </control>
           <Trench>
             <Trench_Info>
@@ -248,6 +260,38 @@
           <item>
             <label>placeholder</label>
             <value>placeholder</value>
+          </item>
+        </select1>
+      </group>
+      <group ref="Search" faims_scrollable="false">
+        <label>{search}</label>
+        <group faims_style="orientation" ref="Colgroup_0">
+          <label/>
+          <group faims_style="even" ref="Col_0">
+            <label/>
+            <input ref="Search_Term">
+              <label>{Search_Term}</label>
+            </input>
+          </group>
+          <group faims_style="large" ref="Col_1">
+            <label/>
+            <trigger ref="Search_Button">
+              <label>{Search}</label>
+            </trigger>
+          </group>
+        </group>
+        <select1 ref="Entity_Types">
+          <label>{Entity_Types}</label>
+          <item>
+            <label>Options not loaded</label>
+            <value>Options not loaded</value>
+          </item>
+        </select1>
+        <select1 appearance="compact" ref="Entity_List">
+          <label>{Entity_List}</label>
+          <item>
+            <label>Options not loaded</label>
+            <value>Options not loaded</value>
           </item>
         </select1>
       </group>

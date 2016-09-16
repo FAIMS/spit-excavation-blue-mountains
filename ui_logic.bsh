@@ -32,7 +32,6 @@ addActionBarItem("internal_gps", new ToggleActionButtonCallback() {
     actionOn() {
         stopGPS();
         showToast("GPS disabled.");
-        updateTrackStatus();
     }
     isActionOff() {
         isInternalGPSOn();
@@ -46,7 +45,6 @@ addActionBarItem("internal_gps", new ToggleActionButtonCallback() {
         }
         startInternalGPS();
         showToast("GPS enabled.");
-        updateTrackStatus();
     }
 });
 
@@ -57,7 +55,6 @@ addActionBarItem("external_gps", new ToggleActionButtonCallback() {
     actionOn() {
         stopGPS();
         showToast("GPS disabled.");
-        updateTrackStatus();
 
     }
     isActionOff() {
@@ -77,7 +74,6 @@ addActionBarItem("external_gps", new ToggleActionButtonCallback() {
             showToast("Please enable bluetooth.");
             this.isActionOff();
         }
-        updateTrackStatus();
     }
 });
 
@@ -324,7 +320,7 @@ deleteTrench() {
 reallyDeleteTrench() {
     deleteArchEnt(trench_id, new DeleteCallback() {
         onDelete(uuid) {
-            cancelTabGroup("Trench", false);        
+            cancelTabGroup("Trench", false);
         }
     });
 }
@@ -425,6 +421,7 @@ addTrenchNavigation() {
 showSlopeTab(Boolean onLoad) {
     fetchOne("select vocabid from vocabulary join attributekey using (attributeid) where attributename = 'Landform Element' and vocabname = '{Slope}';", new FetchCallback() {
         onFetch(result) {
+            if (result == null) return;
             for(vocabid : getFieldValue("Trench/Trench_Info/Landform_Element")) {
                 if(vocabid.getName().equals(result.get(0))) {
                     showTab("Trench/Slope");
@@ -483,8 +480,11 @@ refreshRelatedUnits() {
 
 refreshRelatedSpits() {
     if(!isNull(trench_id)) {
-        fetchAll("select uuid, aenttypename || ' ' || group_concat(coalesce(measure || ' ' || vocabname || '(' ||freetext||')',  measure || ' (' || freetext ||')',  vocabname || ' (' || freetext ||')',  measure || ' ' || vocabname ,  vocabname || ' (' || freetext || ')',  measure || ' (' || freetext || ')',  measure,  vocabname,  freetext,  measure,  vocabname,  freetext), ' - ') as response, valuetimestamp\n"+
-            "  FROM (  SELECT uuid, attributeid, vocabid, attributename, vocabname, measure, freetext, certainty, attributetype, valuetimestamp, aenttypename\n"+
+        fetchAll(
+            "SELECT uuid, response \n"+
+            "  FROM latestNonDeletedArchEntFormattedIdentifiers\n" +
+            " WHERE uuid IN (\n" +
+            "          SELECT uuid\n"+
             "            FROM latestNonDeletedArchentIdentifiers\n"+
             "           WHERE aenttypename = 'Spit'\n"+
             "             AND uuid in (select uuid\n"+
@@ -497,8 +497,7 @@ refreshRelatedSpits() {
             "                                                       and relntypeName = 'TrenchSpit')\n"+
             "                             and uuid != "+trench_id+")\n"+
             "        ORDER BY uuid, attributename DESC)\n"+
-            "group by uuid\n"+
-            "order by valuetimestamp desc, uuid, attributename;", new FetchCallback() {
+            "order by response;", new FetchCallback() {
                 onFetch(result) {
                     populateList("Trench/Spits/Spit_List", result);
                 }
@@ -612,7 +611,7 @@ loadUnitFrom(archentid) {
         showToast("No Unit selected");
         return;
     }
-    showTabGroup("Unit", unit_id, new FetchCallback() {
+    showTabGroup("Unit", archentid, new FetchCallback() {
         onFetch(result) {
             unit_id = archentid;
             showGrassRootsTab(true);
@@ -799,6 +798,8 @@ addUnitNavigation() {
 autoNumUnit(Callable callback) {
     fetchOne("select value from localSettings where key = 'Unit"+ trench_id +"';", new FetchCallback() {
         onFetch(result) {
+            if (result == null) return;
+
             setFieldValue("Unit/Soil/Unit_ID", result.get(0));
             if(callback != null) callback.call();
         }
@@ -812,6 +813,7 @@ autoNumUnit(Callable callback) {
 updateUnitCounter(Callable callback) {
     fetchOne("select value from localSettings where key = 'Unit"+ trench_id +"';", new FetchCallback() {
         onFetch(result) {
+            if (result == null) return;
             next_unit_id = result.get(0);
             try {
                 if(Integer.parseInt(getFieldValue("Unit/Soil/Unit_ID")) >= Integer.parseInt(next_unit_id)) {
@@ -857,6 +859,7 @@ updateUnitCounter(Callable callback) {
 showGrassRootsTab(Boolean onLoad) {
     fetchOne("select vocabid from vocabulary join attributekey using (attributeid) where attributename = 'Inclusions' and vocabname = '{Grass_roots}';", new FetchCallback() {
         onFetch(result) {
+            if (result == null) return;
             for(vocabid : getFieldValue("Unit/Soil/Inclusions")) {
                 if(vocabid.getName().equals(result.get(0))) {
                     showTab("Unit/Grass_Roots");
@@ -908,6 +911,7 @@ loadSpitFrom(archentid) {
     }
     showTabGroup("Spit", archentid, new FetchCallback() {
         onFetch(result) {
+            if (result == null) return;
             spit_id = archentid;
             populateEntityListsInTabGroup("Spit");
             saveTabGroup("Spit", spit_id, null, null, new SaveCallback() {
@@ -1040,6 +1044,7 @@ addSpitNavigation() {
 autoNumSpit() {
     fetchOne("select value from localSettings where key = 'Spit"+ trench_id +"';", new FetchCallback() {
         onFetch(result) {
+            if (result == null) return;
             setFieldValue("Spit/Spit_Info/Spit_ID", result.get(0));
             saveSpit(new Callable() {
                 call() {
@@ -1066,6 +1071,7 @@ autoNumSpit() {
 updateSpitCounter(Callable callback) {
     fetchOne("select value from localSettings where key = 'Spit"+ trench_id +"';", new FetchCallback() {
         onFetch(result) {
+            if (result == null) return;
             next_spit_id = result.get(0);
             try {
                 if(Integer.parseInt(getFieldValue("Spit/Spit_Info/Spit_ID")) >= Integer.parseInt(next_spit_id)) {
@@ -1136,7 +1142,6 @@ saveEntitiesToHierRel(String type, String entity1, String entity2, String e1verb
       }
     }
     onError(message) {
-      Log.e("saveEntitiesToHierRel", message);
       showToast(message);
     }
   });
@@ -1281,7 +1286,6 @@ duplicateArtefact(){
 
       fetchAll(getDuplicateRelnQuery(uuidOld), new FetchCallback(){
         onFetch(result) {
-          Log.e("Module", result.toString());
           makeDuplicateRelationships(result, artefact_id);
           showToast("{Duplicated_record}");
           dialog.dismiss();
@@ -1345,10 +1349,10 @@ newPhotolog() {
 
 loadPhotolog() {
     archent_id = getListItemValue();
-    loadPhotologFrom(archent_id);
+    loadPhotographlogFrom(archent_id);
 }
 
-loadPhotologFrom(archent_id) {
+loadPhotographlogFrom(archent_id) {
     if (isNull(archent_id)) {
         showToast("No record selected");
         return;
@@ -1528,10 +1532,10 @@ newNote() {
 
 loadNote() {
     archent_id = getListItemValue();
-    loadNoteFrom(archent_id);
+    loadNotesFrom(archent_id);
 }
 
-loadNoteFrom(archent_id) {
+loadNotesFrom(archent_id) {
     if (isNull(archent_id)) {
         showToast("No record selected");
         return;
@@ -1554,7 +1558,6 @@ loadNoteFrom(archent_id) {
             showToast(message);
         }
     });
-    
 }
 
 activateAutoSaveNote() {
@@ -1762,6 +1765,83 @@ checkProjection() {
 checkProjection();
 
 /******************************************************************************/
+/*                                   SEARCH                                   */
+/******************************************************************************/
+onEvent("control/Search"               , "show"  , "search();");
+onEvent("control/Search/Entity_List"   , "click" , "loadEntity();");
+onEvent("control/Search/Search_Button" , "click" , "search()");
+onEvent("control/Search/Search_Term"   , "click" , "clearSearch()");
+onEvent("control/Search/Entity_Types"  , "click" , "search()");
+
+entityTypes = new ArrayList();
+entityTypes.add(new NameValuePair("Artefact",       "Artefact"      ));
+entityTypes.add(new NameValuePair("Notes",          "Notes"         ));
+entityTypes.add(new NameValuePair("Photograph log", "Photograph log"));
+entityTypes.add(new NameValuePair("Spit",           "Spit"          ));
+entityTypes.add(new NameValuePair("Unit",           "Unit"          ));
+entityTypes.add(new NameValuePair("Trench",         "Trench"        ));
+
+populateDropDown("control/Search/Entity_Types", entityTypes);
+
+clearSearch(){
+  setFieldValue("control/Search/Search_Term","");
+}
+
+search(){
+  String tabgroup = "control";
+  String refEntityList  = tabgroup + "/Search/Entity_List";
+  String refSearchTerm  = tabgroup + "/Search/Search_Term";
+  String refEntityTypes = tabgroup + "/Search/Entity_Types";
+
+  String type = getFieldValue(refEntityTypes);
+  String term = getFieldValue(refSearchTerm);
+  String searchQuery = "SELECT uuid, response "+
+                       "  FROM latestNonDeletedArchEntFormattedIdentifiers  "+
+                       " WHERE uuid in (SELECT uuid "+
+                       "                  FROM latestNonDeletedArchEntIdentifiers "+
+                       "                 WHERE measure LIKE '"+term+"'||'%'  "+
+                       "                   AND ( aenttypename LIKE '"+type+"' OR '' = '"+type+"' ) "+
+                       "                )  "+
+                       " ORDER BY response "+
+                       " LIMIT ? "+
+                       "OFFSET ? ";
+
+  populateCursorList(refEntityList, searchQuery, 25);
+  refreshTabgroupCSS(tabgroup);
+}
+
+loadEntity() {
+  loadEntity(false);
+}
+loadEntity(Boolean isDropdown) {
+  if (isDropdown) {
+    loadEntityFrom(getDropdownItemValue());
+  } else {
+    loadEntityFrom(getListItemValue());
+  }
+}
+
+loadEntityFrom(String entityID) {
+  if (isNull(entityID)) {
+    return;
+  }
+
+  String getEntTypeNameQ = "SELECT aenttypename " +
+                           "  FROM latestnondeletedarchent " +
+                           "  JOIN aenttype " +
+                           " USING (aenttypeid) " +
+                           " WHERE uuid = '" + entityID + "'";
+  fetchAll(getEntTypeNameQ, new FetchCallback() {
+    onFetch(result) {
+      if (result == null) return;
+      String archEntName = result.get(0).get(0);
+      String loadFunction = "load" + archEntName.replaceAll(" ", "") + "From(entityID)"; // Typical value: loadContextFrom(entityID)
+      eval(loadFunction);
+    }
+  });
+}
+
+/******************************************************************************/
 /*                POPULATION OF ENTITY AND CHILD ENTITY LISTS                 */
 /******************************************************************************/
 /*
@@ -1822,7 +1902,6 @@ populateMenuWithEntities (
       populateCursorList(path, q, 25);
       break;
     default:
-      Log.e("populateMenuWithEntities ", "Unexpected type '" + viewType + "'");
   }
 }
 
@@ -1915,6 +1994,7 @@ String device = "";
 login() {
     fetchOne("select userid,fname,lname,email from user where userid='" + getListItemValue() + "';", new FetchCallback() {
         onFetch(result) {
+            if (result == null) return;
             user = new User(result.get(0),result.get(1),result.get(2),result.get(3));
             setUser(user);
             username = result.get(1) + " " + result.get(2);

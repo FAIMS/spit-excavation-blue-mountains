@@ -530,11 +530,11 @@
     <description></description>
     <property name="Spit Trench ID" type="freetext" isIdentifier="true">
       <description>Description TBD</description>
-      <formatString>$2 </formatString>
+      <formatString>Trench ID: $2 </formatString>
     </property>
     <property name="Spit ID" type="freetext" isIdentifier="true">
       <description>Description TBD</description>
-      <formatString>$2</formatString>
+      <formatString>Spit ID: $2</formatString>
     </property>
     <property name="Bucket Count" type="freetext">
       <description>Description TBD</description>
@@ -631,7 +631,7 @@
     <description/>
     <property name="Artefact Class" isIdentifier="true" type="vocab">
       <description/>
-      <formatString><![CDATA[$2 ]]></formatString>
+      <formatString><![CDATA[$1 ]]></formatString>
       <appendCharacterString><![CDATA[ - ]]></appendCharacterString>
       <lookup>
         <term>{No_Observation}
