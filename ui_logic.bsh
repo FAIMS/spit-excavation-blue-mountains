@@ -1787,7 +1787,6 @@ entityTypes.add(new NameValuePair("Artefact",       "Artefact"      ));
 entityTypes.add(new NameValuePair("Notes",          "Notes"         ));
 entityTypes.add(new NameValuePair("Photograph log", "Photograph log"));
 entityTypes.add(new NameValuePair("Spit",           "Spit"          ));
-entityTypes.add(new NameValuePair("Unit",           "Unit"          ));
 entityTypes.add(new NameValuePair("Trench",         "Trench"        ));
 
 populateDropDown("control/Search/Entity_Types", entityTypes);

@@ -22,11 +22,11 @@
     <description></description>
     <property name="Trench ID" type="freetext" isIdentifier="true">
       <description>Description TBD</description>
-      <formatString>$2 </formatString>
+      <formatString>$2 - </formatString>
     </property>
     <property name="Job Name" type="freetext" isIdentifier="true">
       <description>Description TBD</description>
-      <formatString>$2 </formatString>
+      <formatString>$2 - </formatString>
     </property>
     <property name="T Author" type="freetext" isIdentifier="true">
       <description>Description TBD</description>
@@ -262,7 +262,7 @@
   <ArchaeologicalElement name="Unit">
     <property name="Unit ID" type="freetext" isIdentifier="true">
       <description>Description TBD</description>
-      <formatString>$2 </formatString>
+      <formatString>$2 - </formatString>
     </property>
     <property name="Horizon" type="freetext" isIdentifier="true">
       <description>Description TBD</description>
@@ -612,7 +612,7 @@
     <description>Notes</description>
     <property name="Note Label" isIdentifier= "true" type="freetext">
       <description>Label describing note</description>
-      <formatString>$2 </formatString>
+      <formatString>$2 - </formatString>
     </property>
     <property name="Note" type="enum">
       <description>Notes</description>
@@ -625,7 +625,7 @@
     </property>
     <property name="Author" isIdentifier= "true" type="freetext">
       <description>Description TBD</description>
-      <formatString>$2 </formatString>
+      <formatString>$2 - </formatString>
     </property>
     <property name="Timestamp" isIdentifier= "true" type="freetext">
       <description>Description TBD</description>
@@ -636,10 +636,10 @@
   <ArchaeologicalElement name="Artefact">
     <description/>
     <property name="Artefact Spit ID" isIdentifier= "true" type="freetext">
-      <formatString>$2 </formatString>
+      <formatString>$2 - </formatString>
     </property>
     <property name="Artefact ID" isIdentifier= "true" type="freetext">
-      <formatString>$2 </formatString>
+      <formatString>$2 - </formatString>
     </property>
     <property name="X" type="measure">
       <description/>

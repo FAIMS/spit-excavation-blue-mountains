@@ -209,6 +209,7 @@
       <bind nodeset="/faims/Spit/Spit_Info/Spit_ID" type="decimal"/>
       <bind nodeset="/faims/Spit/Spit_Info/Artefact_Density" type="decimal"/>
       <bind nodeset="/faims/Spit/Spit_Info/Notes" type="string"/>
+      <bind nodeset="/faims/Spit/Spit_Info/Bucket_Count" type="decimal"/>
     </model>
   </h:head>
   <h:body>
