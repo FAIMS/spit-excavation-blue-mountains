@@ -599,7 +599,7 @@
             <value>0</value>
           </item>
         </select>
-        <trigger ref="Button_Photo">
+        <trigger ref="Button_Photo" faims_style_class="faims-blue">
           <label>{Button_Photo}</label>
         </trigger>
         <input ref="Notes" faims_attribute_name="Notes" faims_attribute_type="measure" faims_certainty="true" faims_annotation="true" faims_read_only="false">
@@ -608,7 +608,7 @@
       </group>
       <group ref="Artefacts" faims_scrollable="false">
         <label>{Artefacts}</label>
-        <trigger ref="New_Artefact">
+        <trigger ref="New_Artefact" faims_style_class="faims-blue">
           <label>{New_Artefact}</label>
         </trigger>
         <select1 appearance="compact" ref="List_of_Artefacts" faims_annotation="false" faims_certainty="false">
@@ -681,13 +681,13 @@
       <label>{Artefact}</label>
       <group ref="Artefact">
         <label>{Artefact}</label>
-        <input faims_attribute_type="measure" ref="X" faims_attribute_name="X">
+        <input faims_attribute_type="measure" ref="X" faims_attribute_name="X" faims_style_class="required">
           <label>{X}</label>
         </input>
-        <input faims_attribute_type="measure" ref="Y" faims_attribute_name="Y">
+        <input faims_attribute_type="measure" ref="Y" faims_attribute_name="Y" faims_style_class="required">
           <label>{Y}</label>
         </input>
-        <input faims_attribute_type="measure" ref="Z" faims_attribute_name="Z">
+        <input faims_attribute_type="measure" ref="Z" faims_attribute_name="Z" faims_style_class="required">
           <label>{Z}</label>
         </input>
         <input faims_attribute_type="measure" ref="Description" faims_attribute_name="Description">
