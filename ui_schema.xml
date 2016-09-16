@@ -30,6 +30,7 @@
           <control>
             <Excavation_Data>
               <Job_Name/>
+              <Next_Artefact_ID/>
               <newTrench/>
               <TrenchList/>
             </Excavation_Data>
@@ -151,6 +152,8 @@
               <Photo/>
               <Button_Photo/>
               <Notes/>
+              <Pantone_ID/>
+              <Color_Name/>
             </Spit_Info>
             <Artefacts>
               <New_Artefact/>
@@ -179,15 +182,23 @@
           </Notes>
           <Artefact>
             <Artefact>
+              <Spit_ID/>
+              <Artefact_ID/>
               <X/>
               <Y/>
               <Z/>
               <Description/>
               <Artefact_Class/>
+              <Artefact_Measurement/>
             </Artefact>
           </Artefact>
         </faims>
       </instance>
+      <bind nodeset="/faims/Artefact/Artefact/Spit_ID" type="decimal"/>
+      <bind nodeset="/faims/Artefact/Artefact/Artefact_ID" type="decimal"/>
+      <bind nodeset="/faims/Artefact/Artefact/X" type="decimal"/>
+      <bind nodeset="/faims/Artefact/Artefact/Y" type="decimal"/>
+      <bind nodeset="/faims/Artefact/Artefact/Z" type="decimal"/>
       <bind nodeset="/faims/Trench/Trench_Info/Trench_ID" type="decimal"/>
       <bind nodeset="/faims/Trench/Trench_Info/container1/child1/Latitude" type="decimal"/>
       <bind nodeset="/faims/Trench/Trench_Info/container1/child2/Longitude" type="decimal"/>
@@ -241,6 +252,9 @@
         <label>{Excavation_Data}</label>
         <input faims_certainty="false" faims_read_only="false" ref="Job_Name">
           <label>{Job_Name}</label>
+        </input>
+        <input ref="Next_Artefact_ID" faims_style_class="required">
+          <label>{Next_Artefact_ID}</label>
         </input>
         <trigger ref="newTrench" faims_style_class="faims-blue">
           <label>New {Trench}</label>
@@ -440,7 +454,7 @@
           </item>
         </select1>
       </group>
-      <group ref="Units">
+      <group ref="Units" faims_hidden="true">
         <label>{Units}</label>
         <trigger ref="New_Unit" faims_style_class="faims-blue">
           <label>{New_Unit}</label>
@@ -649,6 +663,12 @@
         <input ref="Notes" faims_attribute_name="Notes" faims_attribute_type="measure" faims_certainty="true" faims_annotation="true" faims_read_only="false">
           <label>{Notes}</label>
         </input>
+        <input ref="Pantone_ID" faims_attribute_name="Pantone ID" faims_attribute_type="measure" faims_certainty="true" faims_annotation="true" faims_read_only="false">
+          <label>Pantone ID</label>
+        </input>
+        <input ref="Color_Name" faims_attribute_name="Color Name" faims_attribute_type="measure" faims_certainty="true" faims_annotation="true" faims_read_only="false">
+          <label>Color Name</label>
+        </input>
       </group>
       <group ref="Artefacts" faims_scrollable="false">
         <label>{Artefacts}</label>
@@ -725,25 +745,34 @@
       <label>{Artefact}</label>
       <group ref="Artefact">
         <label>{Artefact}</label>
-        <input faims_attribute_type="measure" ref="X" faims_attribute_name="X" faims_style_class="required">
+        <input faims_attribute_type="measure" ref="Spit_ID" faims_attribute_name="Artefact Spit ID" faims_read_only="true" faims_style_class="required">
+          <label>Spit ID</label>
+        </input>
+        <input faims_attribute_type="measure" ref="Artefact_ID" faims_attribute_name="Artefact ID" faims_style_class="required">
+          <label>Artefact ID</label>
+        </input>
+        <input faims_attribute_type="measure" ref="X" faims_attribute_name="X">
           <label>{X}</label>
         </input>
-        <input faims_attribute_type="measure" ref="Y" faims_attribute_name="Y" faims_style_class="required">
+        <input faims_attribute_type="measure" ref="Y" faims_attribute_name="Y">
           <label>{Y}</label>
         </input>
-        <input faims_attribute_type="measure" ref="Z" faims_attribute_name="Z" faims_style_class="required">
+        <input faims_attribute_type="measure" ref="Z" faims_attribute_name="Z">
           <label>{Z}</label>
         </input>
         <input faims_attribute_type="measure" ref="Description" faims_attribute_name="Description">
           <label>{Description}</label>
         </input>
-        <select1 faims_attribute_type="vocab" ref="Artefact_Class" faims_attribute_name="Artefact Class">
+        <select1 faims_attribute_type="vocab" ref="Artefact_Class" faims_attribute_name="Artefact Class" faims_style_class="required">
           <label>{Artefact_Class}</label>
           <item>
             <label>Options not loaded</label>
             <value>0</value>
           </item>
         </select1>
+        <input faims_attribute_type="measure" ref="Artefact_Measurement" faims_attribute_name="Artefact Measurement">
+          <label>Artefact Measurement</label>
+        </input>
       </group>
     </group>
 

@@ -563,6 +563,12 @@
     <property name="Photo" type="file" file="true" thumbnail="true">
       <description/>
     </property>
+    <property name="Pantone ID" type="freetext">
+      <description/>
+    </property>
+    <property name="Color Name" type="freetext">
+      <description/>
+    </property>
   </ArchaeologicalElement>
 
     <!-- ARCHENT: Photograph log -->
@@ -629,6 +635,27 @@
 
   <ArchaeologicalElement name="Artefact">
     <description/>
+    <property name="Artefact Spit ID" isIdentifier= "true" type="freetext">
+      <formatString>$2 </formatString>
+    </property>
+    <property name="Artefact ID" isIdentifier= "true" type="freetext">
+      <formatString>$2 </formatString>
+    </property>
+    <property name="X" type="measure">
+      <description/>
+      <formatString><![CDATA[$2 ]]></formatString>
+      <appendCharacterString><![CDATA[ - ]]></appendCharacterString>
+    </property>
+    <property name="Y" type="measure">
+      <description/>
+      <formatString><![CDATA[$2 ]]></formatString>
+      <appendCharacterString><![CDATA[ - ]]></appendCharacterString>
+    </property>
+    <property name="Z" type="measure">
+      <description/>
+      <formatString><![CDATA[$2]]></formatString>
+      <appendCharacterString><![CDATA[ - ]]></appendCharacterString>
+    </property>
     <property name="Artefact Class" isIdentifier="true" type="vocab">
       <description/>
       <formatString><![CDATA[$1 ]]></formatString>
@@ -700,25 +727,13 @@
 <description>Add detail in the Annotation field</description></term>
       </lookup>
     </property>
-    <property name="X" isIdentifier="true" type="measure">
-      <description/>
-      <formatString><![CDATA[$2 ]]></formatString>
-      <appendCharacterString><![CDATA[ - ]]></appendCharacterString>
-    </property>
-    <property name="Y" isIdentifier="true" type="measure">
-      <description/>
-      <formatString><![CDATA[$2 ]]></formatString>
-      <appendCharacterString><![CDATA[ - ]]></appendCharacterString>
-    </property>
-    <property name="Z" isIdentifier="true" type="measure">
-      <description/>
-      <formatString><![CDATA[$2]]></formatString>
-      <appendCharacterString><![CDATA[ - ]]></appendCharacterString>
-    </property>
     <property name="Description" type="measure">
       <description/>
       <formatString><![CDATA[{{if $1 then $1}}{{if and($1, $2) then " " }}{{if $2 then $2}}{{if $3 then " ($3)"}}{{if between($4,0,0.49) then "??" elsif lessThan($4,1) then "?" }}]]></formatString>
       <appendCharacterString><![CDATA[ - ]]></appendCharacterString>
+    </property>
+    <property name="Artefact Measurement" type="freetext">
+      <description>Label describing note</description>
     </property>
   </ArchaeologicalElement>
 </dataSchema>

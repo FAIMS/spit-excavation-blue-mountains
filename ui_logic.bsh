@@ -1265,6 +1265,15 @@ newArtefact(){
   artefact_id = null;
   newTabGroup(tabgroup);
   populateEntityListsInTabGroup(tabgroup);
+
+  // Spit ID inheritance
+  String val = getFieldValue("Spit/Spit_Info/Spit_ID");
+  setFieldValue("Artefact/Artefact/Spit_ID", val);
+
+  // Autonumbering
+  String autoNumDest = "";
+  autoNumDest = "Artefact/Artefact/Artefact_ID";
+  incAutoNum(autoNumDest);
 }
 
 duplicateArtefact(){
@@ -1839,6 +1848,126 @@ loadEntityFrom(String entityID) {
       eval(loadFunction);
     }
   });
+}
+
+/******************************************************************************/
+/*                       AUTONUMBERING HELPER FUNCTIONS                       */
+/******************************************************************************/
+/*
+ * If value of field specified by `ref` is null, sets the field to `defaultVal`,
+ * otherwise increments its value.
+ *
+ * Returns the value the field was updated to.
+ */
+void insertIntoLocalSettings(String ref) {
+  String val = getFieldValue(ref);
+  insertIntoLocalSettings(ref, val);
+}
+
+void insertIntoLocalSettings(String key, String val) {
+  fetchOne("REPLACE INTO localSettings(key, value) VALUES('" + key + "', '" + val + "');");
+}
+
+void insertIntoLocalSettings(String key, Integer val) {
+  insertIntoLocalSettings(key, Integer.toString(val));
+}
+
+void setFieldValueFromLocalSettings(String key, String ref, boolean doOverwrite) {
+  String val = getFieldValue(ref);
+  if (!isNull(val) && !doOverwrite) {
+    return;
+  }
+
+  String q = "SELECT value FROM localSettings WHERE key = '" + key + "';";
+  fetchOne(q, new FetchCallback() {
+    onFetch(result) {
+      if (!isNull(result)) {
+        setFieldValue(ref, result.get(0));
+      }
+    }
+  });
+}
+
+void setFieldValueFromLocalSettings(String ref, boolean doOverwrite) {
+  setFieldValueFromLocalSettings(ref, ref, doOverwrite);
+}
+
+void setFieldValueFromLocalSettings(String ref) {
+  setFieldValueFromLocalSettings(ref, false);
+}
+
+incField(String ref, Integer defaultVal) {
+  String val = getFieldValue(ref);
+
+  if (isNull(val)) {
+    setFieldValue(ref, defaultVal);
+    return defaultVal;
+  }
+
+  Integer inc = Integer.parseInt(val) + 1;
+  setFieldValue(ref, inc);
+  insertIntoLocalSettings(ref, inc.toString());
+
+  return inc;
+}
+
+/* Increments the field at `ref` or returns null if it does not contain a
+ * number.
+ */
+incField(String ref) {
+  return incField(ref, 1);
+}
+
+getStartingIdPaths() {
+  List l = new ArrayList();
+  l.add("control/Excavation_Data/Next_Artefact_ID");
+
+  return l;
+}
+
+loadStartingId(String ref) {
+  // If there's already a value in the field, we don't need to load one.
+  String val = getFieldValue(ref);
+  if (!isNull(val)) {
+    return;
+  }
+
+  // Load a value into the field. Set it to 1 if no value has been previously
+  // saved.
+  String idQ = "SELECT value FROM localSettings WHERE key = '" + ref + "';";
+  fetchOne(idQ, new FetchCallback() {
+    onFetch(result) {
+      if (isNull(result)) setFieldValue(ref, "1"          );
+      else                setFieldValue(ref, result.get(0));
+    }
+  });
+}
+
+loadStartingIds() {
+  List l = getStartingIdPaths();
+
+  for (ref : l) {
+    loadStartingId(ref);
+  }
+}
+
+onEvent("control", "show", "loadStartingIds()");
+
+/*
+ * Sets bindings to save autonum'd fields whenever they're blurred.
+ */
+for (ref : getStartingIdPaths()) {
+  onFocus(ref, null, "insertIntoLocalSettings(\"" + ref + "\", getFieldValue(\"" + ref + "\"));");
+}
+
+incAutoNum(String destPath) {
+  Map destToSource = new HashMap();
+  destToSource.put("Artefact/Artefact/Artefact_ID", "control/Excavation_Data/Next_Artefact_ID");
+
+  String sourcePath = destToSource.get(destPath);
+  String destVal    = getFieldValue(sourcePath);
+  setFieldValue(destPath, destVal);
+  incField(sourcePath);
 }
 
 /******************************************************************************/
