@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataSchema>
+  <RelationshipElement name="SpitArtefact" type="hierarchical">
+    <description>A 1-to-n relationship between the parent and its children, respectively.</description>
+    <parent>Parent Of</parent>
+    <child>Child Of</child>
+  </RelationshipElement>
   <RelationshipElement name="TrenchUnit" type="bidirectional">
     <description>Defines a 1:N relationship between a Trench and related Units</description>
   </RelationshipElement>
@@ -630,7 +635,7 @@
       <appendCharacterString><![CDATA[ - ]]></appendCharacterString>
       <lookup>
         <term>{No_Observation}
-<description/></term>
+<description>data not collected</description></term>
         <term>{Chipped_Stone}
 <description/><term>{Blade}
 <description/></term><term>{Core}
@@ -692,7 +697,7 @@
         <term>{Building_Materials}
 <description/></term>
         <term>{Miscellaneous}
-<description/></term>
+<description>Add detail in the Annotation field</description></term>
       </lookup>
     </property>
     <property name="X" isIdentifier="true" type="measure">
@@ -711,17 +716,6 @@
       <appendCharacterString><![CDATA[ - ]]></appendCharacterString>
     </property>
     <property name="Description" type="measure">
-      <description/>
-      <formatString><![CDATA[{{if $1 then $1}}{{if and($1, $2) then " " }}{{if $2 then $2}}{{if $3 then " ($3)"}}{{if between($4,0,0.49) then "??" elsif lessThan($4,1) then "?" }}]]></formatString>
-      <appendCharacterString><![CDATA[ - ]]></appendCharacterString>
-    </property>
-    <property name="description" type="measure">
-      <description/>
-      <formatString><![CDATA[{{if $1 then $1}}{{if and($1, $2) then " " }}{{if $2 then $2}}{{if $3 then " ($3)"}}{{if between($4,0,0.49) then "??" elsif lessThan($4,1) then "?" }}]]></formatString>
-      <appendCharacterString><![CDATA[ - ]]></appendCharacterString>
-    </property>
-    <property name="description" type="measure">
-      <!--ERROR: This view's name is a duplicate of one or more other views' in this tab group-->
       <description/>
       <formatString><![CDATA[{{if $1 then $1}}{{if and($1, $2) then " " }}{{if $2 then $2}}{{if $3 then " ($3)"}}{{if between($4,0,0.49) then "??" elsif lessThan($4,1) then "?" }}]]></formatString>
       <appendCharacterString><![CDATA[ - ]]></appendCharacterString>

@@ -140,6 +140,10 @@
               <Button_Photo/>
               <Notes/>
             </Spit_Info>
+            <Artefacts>
+              <New_Artefact/>
+              <List_of_Artefacts/>
+            </Artefacts>
           </Spit>
           <Photograph_log>
             <Photograph_log>
@@ -601,6 +605,19 @@
         <input ref="Notes" faims_attribute_name="Notes" faims_attribute_type="measure" faims_certainty="true" faims_annotation="true" faims_read_only="false">
           <label>{Notes}</label>
         </input>
+      </group>
+      <group ref="Artefacts" faims_scrollable="false">
+        <label>{Artefacts}</label>
+        <trigger ref="New_Artefact">
+          <label>{New_Artefact}</label>
+        </trigger>
+        <select1 appearance="compact" ref="List_of_Artefacts" faims_annotation="false" faims_certainty="false">
+          <label>{List_of_Artefacts}</label>
+          <item>
+            <label>Options not loaded</label>
+            <value>0</value>
+          </item>
+        </select1>
       </group>
     </group>
 
