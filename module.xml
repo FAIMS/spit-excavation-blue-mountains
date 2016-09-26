@@ -1,0 +1,261 @@
+<?xml version="1.0" ?>
+<!--TODO: remove duplicated attribs-->
+<!--TODO: determine identifiers-->
+<module suppressWarnings="true">
+
+<User f="nodata">
+  <User f="noscroll">
+    <Select_User t="list" f="user nocertainty noannotation" l="Control"/>
+  </User>
+</User>
+
+<Control f="nodata">
+  <Excavation_Data f="noscroll">
+    <Job_Name/>
+    <autonum/>
+    <New_Trench l="Trench"/>
+    <List_of_Trenches t="list" e="Trench"/>
+  </Excavation_Data>
+  <Spits f="noscroll">
+    <List_of_Spits t="list" e="Spit"/>
+  </Spits>
+  <search/>
+</Control>
+
+<Trench>
+  <Trench_Info>
+    <Job_Name f="readonly"/>
+    <author/>
+    <Trench_ID f="notnull"/>
+    <gps/>
+    <Dimensions>
+      <lookup>
+        <term>{No_Observatio}</term>
+        <term>{1x1m}</term>
+        <term>{2x1m}</term>
+        <term>{0.5mx0.5m}</term>
+        <term>{Other_annotatio}</term>
+      </lookup>
+    </Dimensions>
+    <Artefacts_Present t="radio">
+      <lookup>
+        <term>{No_Observatio}</term>
+        <term>{Yes}</term>
+        <term>{No}</term>
+      </lookup>
+    </Artefacts_Present>
+    <Landform_Genesis t="checkbox">
+      <lookup>
+        <term>{Eroded}</term>
+        <term>{Aggraded}</term>
+        <term>{Stable}</term>
+        <term>{Elevated}</term>
+        <term>{Built_up}</term>
+        <term>{Subsided}</term>
+        <term>{Excavated}</term>
+        <term>{Other}</term>
+      </lookup>
+    </Landform_Genesis>
+    <Landform_Element>
+      <lookup>
+        <term>{Crest}</term>
+        <term>{Slope}</term>
+        <term>{Flat}</term>
+        <term>{Cliff_Escarpment}</term>
+        <term>{Open_Depressio}</term>
+        <term>{Closed_Depressio}</term>
+        <term>{Ridgeline}</term>
+        <term>{Other_annotatio}</term>
+      </lookup>
+    </Landform_Element>
+    <Fill_Slope_Details t="button">
+      <!--TODO-->
+    </Fill_Slope_Details>
+    <Geomorphic_Context>
+      <lookup>
+        <term>{No_Observatio}</term>
+        <term>{Aeolian_(Dune)}</term>
+        <term>{Alluvial}</term>
+        <term>{Colluvial}</term>
+        <term>{Lacustrine}</term>
+        <term>{Volcanic}</term>
+        <term>{Sedimentary}</term>
+        <term>{Metamorphic}</term>
+        <term>{Estuarine}</term>
+        <term>{Marine}</term>
+        <term>{Other}</term>
+      </lookup>
+    </Geomorphic_Context>
+    <Aspect/>
+    <Distance_To_Water/>
+    <Samples_Collected>
+      <lookup>
+        <term>{Soil}</term>
+        <term>{Charcoal}</term>
+        <term>{TL_OSL}</term>
+        <term>{Other}</term>
+      </lookup>
+    </Samples_Collected>
+    <Samples_Details/>
+    <Take_Photo t="camera"/>
+    <Attach_Sketches t="file"/>
+    <View_Attached_Files t="viewfiles"/>
+  </Trench_Info>
+  <Slope f="hidden">
+    <Slope_Degree/>
+    <Slope_Detail/>
+    <Slope_Detail_2/>
+  </Slope>
+  <Spits f="noscroll">
+    <New_Spit      t="button" lc="Spit"/>
+    <List_of_Spits t="list"   ec="Spit"/>
+  </Spits>
+  <PhotoLog f="noscroll">
+    <New_Photograph_Log      t="button" lc="Photograph_log"/>
+    <List_of_Photograph_Logs t="list"   ec="Photograph_log"/>
+  </PhotoLog>
+  <Notes f="noscroll">
+    <New_Note      t="button" lc="Note"/>
+    <List_of_Notes t="list"   ec="Note"/>
+  </Notes>
+  <Vars f="hidden">
+    <timestamp/>
+  </Vars>
+</Trench>
+
+<Spit>
+  <Spit_Info>
+    <Job_Name f="id readonly"/>
+    <Trench_ID f="id readonly"/>
+    <author/>
+    <Spit_ID f="id autonum"/>
+    <Bucket_Count b="decimal"/>
+    <Thickness/>
+    <Artefact_Count b="decimal"/>
+    <Artefact_Type/>
+    <Attach_Photograph t="camera"/>
+    <Notes/>
+    <Pantone_ID/>
+    <Color_Name/>
+  </Spit_Info>
+  <Artefacts>
+    <New_Artefact/>
+    <List_of_Artefacts/>
+  </Artefacts>
+</Spit>
+
+<Photograph_log>
+  Photograph Log
+  <Photograph_log>
+    Photograph Log
+    <Job_Name f="id readonly"/>
+    <Trench_ID f="id readonly"/>
+    <author f="readonly"/>
+    <timestamp f="readonly"/>
+    <Photograph_reference_ID f="notnull"/>
+    <Description/>
+  </Photograph_log>
+</Photograph_log>
+
+<Notes>
+  <Notes>
+    <Job_Name f="id readonly noannotation nocertainty"/>
+    <Trench_ID f="id readonly noannotation nocertainty"/>
+    <author f="readonly noannotation nocertainty"/>
+    <timestamp f="readonly noannotation nocertainty"/>
+    <Note_Label f="notnull noannotation nocertainty"/>
+    <Note/>
+  </Notes>
+</Notes>
+
+<Artefact>
+  <Artefact>
+    <Spit_ID f="id readonly"/>
+    <Artefact_ID f="id autonum"/>
+    <X b="decimal"/>
+    <Y b="decimal"/>
+    <Z b="decimal"/>
+    <Description/>
+    <Artefact_Class f="notnull">
+      <lookup>
+        <term>{No_Observation}
+          <description>data not collected</description>
+        </term>
+        <term>
+          {Chipped_Stone}
+          <term>{Blade}</term>
+          <term>{Core}</term>
+          <term>{Cache}</term>
+          <term>{Other}</term>
+        </term>
+        <term>{Ground_Stone}
+          <term>{Bead}</term>
+          <term>{Grinder}</term>
+          <term>{Pestle}</term>
+          <term>{Shaft_Straightener}</term>
+          <term>{Pendant}</term>
+          <term>{Incised_Stone}</term>
+          <term>{Polisher}</term>
+          <term>{Other}</term>
+        </term>
+        <term>{Bone}
+          <term>{Point}</term>
+          <term>{Bead}</term>
+          <term>{Other}</term>
+        </term>
+        <term>{Shell}
+          <term>{Bead}</term>
+          <term>{Other}</term>
+        </term>
+        <term>{Plant}
+          <term>{Charcoal}</term>
+          <term>{Hackberry}</term>
+          <term>{Charred_Seed}</term>
+          <term>{Siliceous_Material}</term>
+          <term>{Phytolith}</term>
+          <term>{Impression_Cast}</term>
+          <term>{Other}</term>
+        </term>
+        <term>{Ochre}</term>
+        <term>{Clay_Object}
+          <term>{Figurine}</term>
+          <term>{Geometric_object}</term>
+          <term>{Token}</term>
+          <term>{Other}</term>
+        </term>
+        <term>{Ceramic}
+          <term>{Coarse}</term>
+          <term>{Fine}</term>
+          <term>{Terracotta}</term>
+          <term>{Other}</term>
+        </term>
+        <term>{Glass}
+          <term>{Black}</term>
+          <term>{Colourless}</term>
+          <term>{Coloured}</term>
+        </term>
+        <term>{Metal}
+          <term>{Ferrous}</term>
+          <term>{Copper_alloy}</term>
+          <term>{Other}</term>
+        </term>
+        <term>{Building_Materials}</term>
+        <term>{Miscellaneous}
+          <description>Add detail in the Annotation field</description>
+        </term>
+      </lookup>
+    </Artefact_Class>
+    <Artefact_Measurement/>
+  </Artefact>
+</Artefact>
+
+<logic><![CDATA[
+
+//Checking they have the correct projection EPSG:28355: GDA94 / MGA zone 55
+checkProjection() {
+     showWarning("Projection Alert","You are using projection EPSG " + getModuleSrid() + ". To change the projection, do the following:\n1. Log into the FAIMS Web Server.\n2. Open this module.\n3. Click edit module.\n4. Change the value in the \"Module SRID:\" to a projection of your choice.");
+}
+
+checkProjection();
+]]></logic>
+</module>
