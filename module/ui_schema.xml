@@ -1,0 +1,626 @@
+<?xml version="1.0"?>
+<h:html xmlns:h="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/2002/xforms" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:jr="http://openrosa.org/javarosa" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <h:head>
+    <h:title>Fill This In</h:title>
+    <model>
+      <instance>
+        <faims id="Fill_This_In">
+          <style>
+            <orientation>
+              <orientation/>
+            </orientation>
+            <even>
+              <layout_weight/>
+            </even>
+            <large>
+              <layout_weight/>
+            </large>
+          </style>
+          <User>
+            <User>
+              <Select_User/>
+            </User>
+          </User>
+          <Control>
+            <Excavation_Data>
+              <Job_Name/>
+              <Next_Spit_ID/>
+              <Next_Artefact_ID/>
+              <New_Trench/>
+              <List_of_Trenches/>
+            </Excavation_Data>
+            <Spits>
+              <New_Spit/>
+              <List_of_Spits/>
+            </Spits>
+            <Search>
+              <Colgroup_0>
+                <Col_0>
+                  <Search_Term/>
+                </Col_0>
+                <Col_1>
+                  <Search_Button/>
+                </Col_1>
+              </Colgroup_0>
+              <Entity_Types/>
+              <Entity_List/>
+            </Search>
+          </Control>
+          <Trench>
+            <Trench_Info>
+              <Job_Name/>
+              <author/>
+              <Trench_ID/>
+              <Colgroup_GPS_0>
+                <Col_0>
+                  <Latitude/>
+                </Col_0>
+                <Col_1>
+                  <Longitude/>
+                </Col_1>
+              </Colgroup_GPS_0>
+              <Colgroup_GPS_1>
+                <Col_0>
+                  <Northing/>
+                </Col_0>
+                <Col_1>
+                  <Easting/>
+                </Col_1>
+                <Col_2>
+                  <Accuracy/>
+                </Col_2>
+              </Colgroup_GPS_1>
+              <Take_From_GPS/>
+              <Dimensions/>
+              <Artefacts_Present/>
+              <Landform_Genesis/>
+              <Landform_Element/>
+              <Fill_Slope_Details/>
+              <Geomorphic_Context/>
+              <Aspect/>
+              <Distance_To_Water/>
+              <Samples_Collected/>
+              <Samples_Details/>
+              <Take_Photo/>
+              <Button_Take_Photo/>
+              <Attach_Sketches/>
+              <Button_Attach_Sketches/>
+              <View_Attached_Files/>
+            </Trench_Info>
+            <Slope>
+              <Slope_Degree/>
+              <Slope_Detail/>
+              <Slope_Detail_2/>
+            </Slope>
+            <Spits>
+              <New_Spit/>
+              <List_of_Spits/>
+            </Spits>
+            <PhotoLog>
+              <New_Photograph_Log/>
+              <List_of_Photograph_Logs/>
+            </PhotoLog>
+            <Notes>
+              <New_Note/>
+              <List_of_Notes/>
+            </Notes>
+            <Vars>
+              <timestamp/>
+            </Vars>
+          </Trench>
+          <Spit>
+            <Spit_Info>
+              <Spit_Job_Name/>
+              <Spit_Trench_ID/>
+              <author/>
+              <Spit_ID/>
+              <Bucket_Count/>
+              <Thickness/>
+              <Artefact_Count/>
+              <Artefact_Type/>
+              <Attach_Photograph/>
+              <Button_Attach_Photograph/>
+              <Notes/>
+              <Pantone_ID/>
+              <Color_Name/>
+            </Spit_Info>
+            <Artefacts>
+              <New_Artefact/>
+              <List_of_Artefacts/>
+            </Artefacts>
+          </Spit>
+          <Photograph_log>
+            <Photograph_log>
+              <PL_Job_Name/>
+              <PL_Trench_ID/>
+              <author/>
+              <timestamp/>
+              <Photograph_reference_ID/>
+              <Scene_Type/>
+            </Photograph_log>
+          </Photograph_log>
+          <Notes>
+            <Notes>
+              <N_Job_Name/>
+              <N_Trench_ID/>
+              <author/>
+              <timestamp/>
+              <Note_Label/>
+              <Note/>
+            </Notes>
+          </Notes>
+          <Artefact>
+            <Artefact>
+              <Artefact_Spit_ID/>
+              <Artefact_ID/>
+              <X/>
+              <Y/>
+              <Z/>
+              <Description/>
+              <Artefact_Class/>
+              <Artefact_Measurement/>
+            </Artefact>
+          </Artefact>
+          <logic/>
+        </faims>
+      </instance>
+      <bind type="decimal" nodeset="/faims/Control/Excavation_Data/Next_Spit_ID"/>
+      <bind type="decimal" nodeset="/faims/Control/Excavation_Data/Next_Artefact_ID"/>
+      <bind type="decimal" nodeset="/faims/Spit/Spit_Info/Spit_ID"/>
+      <bind type="decimal" nodeset="/faims/Spit/Spit_Info/Bucket_Count"/>
+      <bind type="decimal" nodeset="/faims/Spit/Spit_Info/Artefact_Count"/>
+      <bind type="decimal" nodeset="/faims/Artefact/Artefact/Artefact_ID"/>
+      <bind type="decimal" nodeset="/faims/Artefact/Artefact/X"/>
+      <bind type="decimal" nodeset="/faims/Artefact/Artefact/Y"/>
+      <bind type="decimal" nodeset="/faims/Artefact/Artefact/Z"/>
+    </model>
+  </h:head>
+  <h:body>
+    <group ref="style">
+      <label/>
+      <group ref="orientation">
+        <label/>
+        <input ref="orientation">
+          <label>horizontal</label>
+        </input>
+      </group>
+      <group ref="even">
+        <label/>
+        <input ref="layout_weight">
+          <label>1</label>
+        </input>
+      </group>
+      <group ref="large">
+        <label/>
+        <input ref="layout_weight">
+          <label>3</label>
+        </input>
+      </group>
+    </group>
+    <group ref="User">
+      <label>{User}</label>
+      <group ref="User" faims_scrollable="false">
+        <label>{User}</label>
+        <select1 appearance="compact" ref="Select_User" faims_certainty="false" faims_annotation="false">
+          <label>{Select_User}</label>
+          <item>
+            <label>Options not loaded</label>
+            <value>0</value>
+          </item>
+        </select1>
+      </group>
+    </group>
+    <group ref="Control">
+      <label>{Control}</label>
+      <group ref="Excavation_Data" faims_scrollable="false">
+        <label>{Excavation_Data}</label>
+        <input ref="Job_Name">
+          <label>{Job_Name}</label>
+        </input>
+        <input ref="Next_Spit_ID" faims_style_class="required">
+          <label>{Next_Spit_ID}</label>
+        </input>
+        <input ref="Next_Artefact_ID" faims_style_class="required">
+          <label>{Next_Artefact_ID}</label>
+        </input>
+        <trigger ref="New_Trench">
+          <label>{New_Trench}</label>
+        </trigger>
+        <select1 appearance="compact" ref="List_of_Trenches" faims_annotation="false" faims_certainty="false">
+          <label>{List_of_Trenches}</label>
+          <item>
+            <label>Options not loaded</label>
+            <value>0</value>
+          </item>
+        </select1>
+      </group>
+      <group ref="Spits" faims_scrollable="false">
+        <label>{Spits}</label>
+        <trigger ref="New_Spit">
+          <label>{New_Spit}</label>
+        </trigger>
+        <select1 appearance="compact" ref="List_of_Spits" faims_annotation="false" faims_certainty="false">
+          <label>{List_of_Spits}</label>
+          <item>
+            <label>Options not loaded</label>
+            <value>0</value>
+          </item>
+        </select1>
+      </group>
+      <group ref="Search" faims_scrollable="false">
+        <label>{search}</label>
+        <group faims_style="orientation" ref="Colgroup_0">
+          <label/>
+          <group faims_style="even" ref="Col_0">
+            <label/>
+            <input ref="Search_Term">
+              <label>{Search_Term}</label>
+            </input>
+          </group>
+          <group faims_style="large" ref="Col_1">
+            <label/>
+            <trigger ref="Search_Button">
+              <label>{Search}</label>
+            </trigger>
+          </group>
+        </group>
+        <select1 ref="Entity_Types">
+          <label>{Entity_Types}</label>
+          <item>
+            <label>Options not loaded</label>
+            <value>Options not loaded</value>
+          </item>
+        </select1>
+        <select1 appearance="compact" ref="Entity_List">
+          <label>{Entity_List}</label>
+          <item>
+            <label>Options not loaded</label>
+            <value>Options not loaded</value>
+          </item>
+        </select1>
+      </group>
+    </group>
+    <group ref="Trench" faims_archent_type="Trench">
+      <label>{Trench}</label>
+      <group ref="Trench_Info">
+        <label>{Trench_Info}</label>
+        <input faims_attribute_type="measure" ref="Job_Name" faims_attribute_name="Job Name" faims_read_only="true" faims_certainty="false" faims_annotation="false">
+          <label>{Job_Name}</label>
+        </input>
+        <input ref="author" faims_attribute_name="Trench author" faims_attribute_type="measure" faims_read_only="true" faims_annotation="false" faims_certainty="false">
+          <label>{author}</label>
+          <!--WARNING: Flags ignored-->
+        </input>
+        <input faims_attribute_type="measure" ref="Trench_ID" faims_attribute_name="Trench ID" faims_certainty="false" faims_annotation="false" faims_style_class="required">
+          <label>{Trench_ID}</label>
+        </input>
+        <group ref="Colgroup_GPS_0" faims_style="orientation">
+          <label/>
+          <group ref="Col_0" faims_style="even">
+            <label/>
+            <input ref="Latitude" faims_attribute_name="Latitude" faims_attribute_type="measure" faims_read_only="true" faims_annotation="false" faims_certainty="false">
+              <label>{Latitude}</label>
+            </input>
+          </group>
+          <group ref="Col_1" faims_style="even">
+            <label/>
+            <input ref="Longitude" faims_attribute_name="Longitude" faims_attribute_type="measure" faims_read_only="true" faims_annotation="false" faims_certainty="false">
+              <label>{Longitude}</label>
+            </input>
+          </group>
+        </group>
+        <group ref="Colgroup_GPS_1" faims_style="orientation">
+          <label/>
+          <group ref="Col_0" faims_style="even">
+            <label/>
+            <input ref="Northing" faims_attribute_name="Northing" faims_attribute_type="measure" faims_read_only="true" faims_annotation="false" faims_certainty="false">
+              <label>{Northing}</label>
+            </input>
+          </group>
+          <group ref="Col_1" faims_style="even">
+            <label/>
+            <input ref="Easting" faims_attribute_name="Easting" faims_attribute_type="measure" faims_read_only="true" faims_annotation="false" faims_certainty="false">
+              <label>{Easting}</label>
+            </input>
+          </group>
+          <group ref="Col_2" faims_style="even">
+            <label/>
+            <input ref="Accuracy" faims_attribute_name="Accuracy" faims_attribute_type="measure" faims_read_only="true" faims_annotation="false" faims_certainty="false">
+              <label>{Accuracy__m_}</label>
+            </input>
+          </group>
+        </group>
+        <trigger ref="Take_From_GPS">
+          <label>{Take_From_GPS}</label>
+        </trigger>
+        <select1 faims_attribute_type="vocab" ref="Dimensions" faims_attribute_name="Dimensions">
+          <label>{Dimensions}</label>
+          <item>
+            <label>Options not loaded</label>
+            <value>0</value>
+          </item>
+        </select1>
+        <select1 appearance="full" faims_attribute_type="vocab" ref="Artefacts_Present" faims_attribute_name="Artefacts Present">
+          <label>{Artefacts_Present}</label>
+          <item>
+            <label>Options not loaded</label>
+            <value>0</value>
+          </item>
+        </select1>
+        <select faims_attribute_type="vocab" ref="Landform_Genesis" faims_attribute_name="Landform Genesis">
+          <label>{Landform_Genesis}</label>
+          <item>
+            <label>Options not loaded</label>
+            <value>0</value>
+          </item>
+        </select>
+        <select faims_attribute_type="vocab" ref="Landform_Element" faims_attribute_name="Landform Element">
+          <label>{Landform_Element}</label>
+          <item>
+            <label>Options not loaded</label>
+            <value>0</value>
+          </item>
+        </select>
+        <trigger ref="Fill_Slope_Details">
+          <label>{Fill_Slope_Details}</label>
+        </trigger>
+        <select1 faims_attribute_type="vocab" ref="Geomorphic_Context" faims_attribute_name="Geomorphic Context">
+          <label>{Geomorphic_Context}</label>
+          <item>
+            <label>Options not loaded</label>
+            <value>0</value>
+          </item>
+        </select1>
+        <input faims_attribute_type="measure" ref="Aspect" faims_attribute_name="Aspect">
+          <label>{Aspect}</label>
+        </input>
+        <input faims_attribute_type="measure" ref="Distance_To_Water" faims_attribute_name="Distance To Water">
+          <label>{Distance_To_Water}</label>
+        </input>
+        <select faims_attribute_type="vocab" ref="Samples_Collected" faims_attribute_name="Samples Collected">
+          <label>{Samples_Collected}</label>
+          <item>
+            <label>Options not loaded</label>
+            <value>0</value>
+          </item>
+        </select>
+        <input faims_attribute_type="measure" ref="Samples_Details" faims_attribute_name="Samples Details">
+          <label>{Samples_Details}</label>
+        </input>
+        <select type="camera" faims_attribute_type="measure" faims_sync="true" ref="Take_Photo" faims_attribute_name="Take Photo">
+          <label>{Take_Photo}</label>
+          <item>
+            <label>Options not loaded</label>
+            <value>0</value>
+          </item>
+        </select>
+        <trigger ref="Button_Take_Photo">
+          <label>{Button_Take_Photo}</label>
+        </trigger>
+        <select type="file" faims_attribute_type="measure" faims_sync="true" ref="Attach_Sketches" faims_attribute_name="Attach Sketches">
+          <label>{Attach_Sketches}</label>
+          <item>
+            <label>Options not loaded</label>
+            <value>0</value>
+          </item>
+        </select>
+        <trigger ref="Button_Attach_Sketches">
+          <label>{Button_Attach_Sketches}</label>
+        </trigger>
+        <trigger ref="View_Attached_Files">
+          <label>{View_Attached_Files}</label>
+        </trigger>
+      </group>
+      <group ref="Slope" faims_hidden="true">
+        <label>{Slope}</label>
+        <input faims_attribute_type="measure" ref="Slope_Degree" faims_attribute_name="Slope Degree">
+          <label>{Slope_Degree}</label>
+        </input>
+        <select1 faims_attribute_type="vocab" ref="Slope_Detail" faims_attribute_name="Slope Detail">
+          <label>{Slope_Detail}</label>
+          <item>
+            <label>Options not loaded</label>
+            <value>0</value>
+          </item>
+        </select1>
+        <select1 faims_attribute_type="vocab" ref="Slope_Detail_2" faims_attribute_name="Slope Detail 2">
+          <label>{Slope_Detail_2}</label>
+          <item>
+            <label>Options not loaded</label>
+            <value>0</value>
+          </item>
+        </select1>
+      </group>
+      <group ref="Spits" faims_scrollable="false">
+        <label>{Spits}</label>
+        <trigger ref="New_Spit">
+          <label>{New_Spit}</label>
+        </trigger>
+        <select1 appearance="compact" ref="List_of_Spits" faims_annotation="false" faims_certainty="false">
+          <label>{List_of_Spits}</label>
+          <item>
+            <label>Options not loaded</label>
+            <value>0</value>
+          </item>
+        </select1>
+      </group>
+      <group ref="PhotoLog" faims_scrollable="false">
+        <label>{PhotoLog}</label>
+        <trigger ref="New_Photograph_Log">
+          <label>{New_Photograph_Log}</label>
+        </trigger>
+        <select1 appearance="compact" ref="List_of_Photograph_Logs" faims_annotation="false" faims_certainty="false">
+          <label>{List_of_Photograph_Logs}</label>
+          <item>
+            <label>Options not loaded</label>
+            <value>0</value>
+          </item>
+        </select1>
+      </group>
+      <group ref="Notes" faims_scrollable="false">
+        <label>{Notes}</label>
+        <trigger ref="New_Note">
+          <label>{New_Note}</label>
+        </trigger>
+        <select1 appearance="compact" ref="List_of_Notes" faims_annotation="false" faims_certainty="false">
+          <label>{List_of_Notes}</label>
+          <item>
+            <label>Options not loaded</label>
+            <value>0</value>
+          </item>
+        </select1>
+      </group>
+      <group ref="Vars" faims_hidden="true">
+        <label>{Vars}</label>
+        <input ref="timestamp" faims_attribute_name="Trench timestamp" faims_attribute_type="measure" faims_read_only="true" faims_annotation="false" faims_certainty="false">
+          <label>{timestamp}</label>
+        </input>
+      </group>
+    </group>
+    <group ref="Spit" faims_archent_type="Spit">
+      <label>{Spit}</label>
+      <group ref="Spit_Info">
+        <label>{Spit_Info}</label>
+        <input faims_attribute_type="measure" ref="Spit_Job_Name" faims_attribute_name="Spit Job Name" faims_read_only="true" faims_certainty="false" faims_annotation="false">
+          <label>{Job_Name}</label>
+        </input>
+        <input faims_attribute_type="measure" ref="Spit_Trench_ID" faims_attribute_name="Spit Trench ID" faims_read_only="true" faims_certainty="false" faims_annotation="false">
+          <label>{Trench_ID}</label>
+        </input>
+        <input ref="author" faims_attribute_name="Spit author" faims_attribute_type="measure" faims_read_only="true" faims_annotation="false" faims_certainty="false">
+          <label>{author}</label>
+          <!--WARNING: Flags ignored-->
+        </input>
+        <input faims_attribute_type="measure" ref="Spit_ID" faims_attribute_name="Spit ID" faims_certainty="false" faims_annotation="false" faims_style_class="required">
+          <label>{Spit_ID}</label>
+        </input>
+        <input faims_attribute_type="measure" ref="Bucket_Count" faims_attribute_name="Bucket Count">
+          <label>{Bucket_Count}</label>
+        </input>
+        <input faims_attribute_type="measure" ref="Thickness" faims_attribute_name="Thickness">
+          <label>{Thickness}</label>
+        </input>
+        <input faims_attribute_type="measure" ref="Artefact_Count" faims_attribute_name="Artefact Count">
+          <label>{Artefact_Count}</label>
+        </input>
+        <input faims_attribute_type="measure" ref="Artefact_Type" faims_attribute_name="Artefact Type">
+          <label>{Artefact_Type}</label>
+        </input>
+        <select type="camera" faims_attribute_type="measure" faims_sync="true" ref="Attach_Photograph" faims_attribute_name="Attach Photograph">
+          <label>{Attach_Photograph}</label>
+          <item>
+            <label>Options not loaded</label>
+            <value>0</value>
+          </item>
+        </select>
+        <trigger ref="Button_Attach_Photograph">
+          <label>{Button_Attach_Photograph}</label>
+        </trigger>
+        <input faims_attribute_type="measure" ref="Notes" faims_attribute_name="Notes">
+          <label>{Notes}</label>
+        </input>
+        <input faims_attribute_type="measure" ref="Pantone_ID" faims_attribute_name="Pantone ID">
+          <label>{Pantone_ID}</label>
+        </input>
+        <input faims_attribute_type="measure" ref="Color_Name" faims_attribute_name="Color Name">
+          <label>{Color_Name}</label>
+        </input>
+      </group>
+      <group ref="Artefacts">
+        <label>{Artefacts}</label>
+        <input faims_attribute_type="measure" ref="New_Artefact" faims_attribute_name="New Artefact">
+          <label>{New_Artefact}</label>
+        </input>
+        <input faims_attribute_type="measure" ref="List_of_Artefacts" faims_attribute_name="List of Artefacts">
+          <label>{List_of_Artefacts}</label>
+        </input>
+      </group>
+    </group>
+    <group ref="Photograph_log" faims_archent_type="Photograph log">
+      <label>{Photograph_Log}</label>
+      <group ref="Photograph_log">
+        <label>{Photograph_Log}</label>
+        <input faims_attribute_type="measure" ref="PL_Job_Name" faims_attribute_name="PL Job Name" faims_read_only="true" faims_certainty="false" faims_annotation="false">
+          <label>{Job_Name}</label>
+        </input>
+        <input faims_attribute_type="measure" ref="PL_Trench_ID" faims_attribute_name="PL Trench ID" faims_read_only="true" faims_certainty="false" faims_annotation="false">
+          <label>{Trench_ID}</label>
+        </input>
+        <input ref="author" faims_attribute_name="Photograph_log author" faims_attribute_type="measure" faims_read_only="true" faims_annotation="false" faims_certainty="false">
+          <label>{author}</label>
+          <!--WARNING: Flags ignored-->
+        </input>
+        <input ref="timestamp" faims_attribute_name="Photograph_log timestamp" faims_attribute_type="measure" faims_read_only="true" faims_annotation="false" faims_certainty="false">
+          <label>{timestamp}</label>
+          <!--WARNING: Flags ignored-->
+        </input>
+        <input faims_attribute_type="measure" ref="Photograph_reference_ID" faims_attribute_name="Photograph reference ID" faims_style_class="required">
+          <label>{Photograph_Reference_ID}</label>
+        </input>
+        <input faims_attribute_type="measure" ref="Scene_Type" faims_attribute_name="Scene Type">
+          <label>{Description}</label>
+        </input>
+      </group>
+    </group>
+    <group ref="Notes" faims_archent_type="Notes">
+      <label>{Notes}</label>
+      <group ref="Notes">
+        <label>{Notes}</label>
+        <input faims_attribute_type="measure" ref="N_Job_Name" faims_attribute_name="N Job Name" faims_read_only="true" faims_certainty="false" faims_annotation="false">
+          <label>{Job_Name}</label>
+        </input>
+        <input faims_attribute_type="measure" ref="N_Trench_ID" faims_attribute_name="N Trench ID" faims_read_only="true" faims_certainty="false" faims_annotation="false">
+          <label>{Trench_ID}</label>
+        </input>
+        <input ref="author" faims_attribute_name="Notes author" faims_attribute_type="measure" faims_read_only="true" faims_annotation="false" faims_certainty="false">
+          <label>{author}</label>
+          <!--WARNING: Flags ignored-->
+        </input>
+        <input ref="timestamp" faims_attribute_name="Notes timestamp" faims_attribute_type="measure" faims_read_only="true" faims_annotation="false" faims_certainty="false">
+          <label>{timestamp}</label>
+          <!--WARNING: Flags ignored-->
+        </input>
+        <input faims_attribute_type="measure" ref="Note_Label" faims_attribute_name="Note Label" faims_certainty="false" faims_annotation="false" faims_style_class="required">
+          <label>{Note_Label}</label>
+        </input>
+        <input faims_attribute_type="measure" ref="Note" faims_attribute_name="Note">
+          <label>{Note}</label>
+        </input>
+      </group>
+    </group>
+    <group ref="Artefact" faims_archent_type="Artefact">
+      <label>{Artefact}</label>
+      <group ref="Artefact">
+        <label>{Artefact}</label>
+        <input faims_attribute_type="measure" ref="Artefact_Spit_ID" faims_attribute_name="Artefact Spit ID" faims_read_only="true" faims_style_class="required">
+          <label>{Spit_ID}</label>
+        </input>
+        <input faims_attribute_type="measure" ref="Artefact_ID" faims_attribute_name="Artefact ID" faims_style_class="required">
+          <label>{Artefact_ID}</label>
+        </input>
+        <input faims_attribute_type="measure" ref="X" faims_attribute_name="X">
+          <label>{X}</label>
+        </input>
+        <input faims_attribute_type="measure" ref="Y" faims_attribute_name="Y">
+          <label>{Y}</label>
+        </input>
+        <input faims_attribute_type="measure" ref="Z" faims_attribute_name="Z">
+          <label>{Z}</label>
+        </input>
+        <input faims_attribute_type="measure" ref="Description" faims_attribute_name="Description">
+          <label>{Description}</label>
+        </input>
+        <select1 faims_attribute_type="vocab" ref="Artefact_Class" faims_attribute_name="Artefact Class" faims_style_class="required">
+          <label>{Artefact_Class}</label>
+          <item>
+            <label>Options not loaded</label>
+            <value>0</value>
+          </item>
+        </select1>
+        <input faims_attribute_type="measure" ref="Artefact_Measurement" faims_attribute_name="Artefact Measurement">
+          <label>{Artefact_Measurement}</label>
+        </input>
+      </group>
+    </group>
+  </h:body>
+</h:html>

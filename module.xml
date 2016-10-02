@@ -1,6 +1,4 @@
 <?xml version="1.0" ?>
-<!--TODO: remove duplicated attribs-->
-<!--TODO: determine identifiers-->
 <module suppressWarnings="true">
 
 <User f="nodata">
@@ -13,88 +11,102 @@
   <Excavation_Data f="noscroll">
     <Job_Name/>
     <autonum/>
-    <New_Trench l="Trench"/>
-    <List_of_Trenches t="list" e="Trench"/>
+    <New_Trench       t="button" l="Trench"/>
+    <List_of_Trenches t="list"   e="Trench"/>
   </Excavation_Data>
   <Spits f="noscroll">
-    <List_of_Spits t="list" e="Spit"/>
+    <New_Spit      t="button" l="Spit"/>
+    <List_of_Spits t="list"   e="Spit"/>
   </Spits>
   <search/>
 </Control>
 
 <Trench>
   <Trench_Info>
-    <Job_Name f="readonly"/>
-    <author/>
-    <Trench_ID f="notnull"/>
+    <Job_Name f="id readonly nocertainty noannotation">
+      <str>
+        <pos>2</pos>
+        <fmt>$2 - </fmt>
+      </str>
+    </Job_Name>
+    <author f="id nocertainty noannotation">
+      <str>
+        <pos>3</pos>
+        <fmt>$2</fmt>
+      </str>
+    </author>
+    <Trench_ID f="id notnull nocertainty noannotation">
+      <str>
+        <pos>1</pos>
+        <fmt>$2 - </fmt>
+      </str>
+    </Trench_ID>
     <gps/>
     <Dimensions>
-      <lookup>
-        <term>{No_Observatio}</term>
-        <term>{1x1m}</term>
-        <term>{2x1m}</term>
-        <term>{0.5mx0.5m}</term>
-        <term>{Other_annotatio}</term>
-      </lookup>
+      <opts>
+        <opt>No Observation</opt>
+        <opt>1 x 1m</opt>
+        <opt>2 x 1m</opt>
+        <opt>0.5m x 0.5m</opt>
+        <opt>Other (add annotation)</opt>
+      </opts>
     </Dimensions>
     <Artefacts_Present t="radio">
-      <lookup>
-        <term>{No_Observatio}</term>
-        <term>{Yes}</term>
-        <term>{No}</term>
-      </lookup>
+      <opts>
+        <opt>No Observation</opt>
+        <opt>Yes</opt>
+        <opt>No</opt>
+      </opts>
     </Artefacts_Present>
     <Landform_Genesis t="checkbox">
-      <lookup>
-        <term>{Eroded}</term>
-        <term>{Aggraded}</term>
-        <term>{Stable}</term>
-        <term>{Elevated}</term>
-        <term>{Built_up}</term>
-        <term>{Subsided}</term>
-        <term>{Excavated}</term>
-        <term>{Other}</term>
-      </lookup>
+      <opts>
+        <opt>Eroded</opt>
+        <opt>Aggraded</opt>
+        <opt>Stable</opt>
+        <opt>Elevated</opt>
+        <opt>Built up</opt>
+        <opt>Subsided</opt>
+        <opt>Excavated</opt>
+        <opt>Other</opt>
+      </opts>
     </Landform_Genesis>
-    <Landform_Element>
-      <lookup>
-        <term>{Crest}</term>
-        <term>{Slope}</term>
-        <term>{Flat}</term>
-        <term>{Cliff_Escarpment}</term>
-        <term>{Open_Depressio}</term>
-        <term>{Closed_Depressio}</term>
-        <term>{Ridgeline}</term>
-        <term>{Other_annotatio}</term>
-      </lookup>
+    <Landform_Element t="checkbox">
+      <opts>
+        <opt>Crest</opt>
+        <opt>Slope (add Slope Details)</opt>
+        <opt>Flat</opt>
+        <opt>Cliff/Escarpment</opt>
+        <opt>Open Depression</opt>
+        <opt>Closed Depression</opt>
+        <opt>Ridgeline</opt>
+        <opt>Other (add annotation)</opt>
+      </opts>
     </Landform_Element>
-    <Fill_Slope_Details t="button">
-      <!--TODO-->
-    </Fill_Slope_Details>
+    <Fill_Slope_Details t="button"/>
     <Geomorphic_Context>
-      <lookup>
-        <term>{No_Observatio}</term>
-        <term>{Aeolian_(Dune)}</term>
-        <term>{Alluvial}</term>
-        <term>{Colluvial}</term>
-        <term>{Lacustrine}</term>
-        <term>{Volcanic}</term>
-        <term>{Sedimentary}</term>
-        <term>{Metamorphic}</term>
-        <term>{Estuarine}</term>
-        <term>{Marine}</term>
-        <term>{Other}</term>
-      </lookup>
+      <opts>
+        <opt>No Observation</opt>
+        <opt>Aeolian (Dune)</opt>
+        <opt>Alluvial</opt>
+        <opt>Colluvial</opt>
+        <opt>Lacustrine</opt>
+        <opt>Volcanic</opt>
+        <opt>Sedimentary</opt>
+        <opt>Metamorphic</opt>
+        <opt>Estuarine</opt>
+        <opt>Marine</opt>
+        <opt>Other</opt>
+      </opts>
     </Geomorphic_Context>
     <Aspect/>
     <Distance_To_Water/>
-    <Samples_Collected>
-      <lookup>
-        <term>{Soil}</term>
-        <term>{Charcoal}</term>
-        <term>{TL_OSL}</term>
-        <term>{Other}</term>
-      </lookup>
+    <Samples_Collected t="checkbox">
+      <opts>
+        <opt>Soil</opt>
+        <opt>Charcoal</opt>
+        <opt>TL/OSL</opt>
+        <opt>Other</opt>
+      </opts>
     </Samples_Collected>
     <Samples_Details/>
     <Take_Photo t="camera"/>
@@ -103,8 +115,26 @@
   </Trench_Info>
   <Slope f="hidden">
     <Slope_Degree/>
-    <Slope_Detail/>
-    <Slope_Detail_2/>
+    <Slope_Detail>
+      <opts>
+        <opt>No Observation</opt>
+        <opt>Simple</opt>
+        <opt>Upper</opt>
+        <opt>Middle</opt>
+        <opt>Lower</opt>
+        <opt>Other</opt>
+      </opts>
+    </Slope_Detail>
+    <Slope_Detail_2>
+      <opts>
+        <opt>No Observation</opt>
+        <opt>Waxing</opt>
+        <opt>Waning</opt>
+        <opt>Maximal</opt>
+        <opt>Minimal</opt>
+        <opt>Other</opt>
+      </opts>
+    </Slope_Detail_2>
   </Slope>
   <Spits f="noscroll">
     <New_Spit      t="button" lc="Spit"/>
@@ -115,8 +145,8 @@
     <List_of_Photograph_Logs t="list"   ec="Photograph_log"/>
   </PhotoLog>
   <Notes f="noscroll">
-    <New_Note      t="button" lc="Note"/>
-    <List_of_Notes t="list"   ec="Note"/>
+    <New_Note      t="button" lc="Notes"/>
+    <List_of_Notes t="list"   ec="Notes"/>
   </Notes>
   <Vars f="hidden">
     <timestamp/>
@@ -125,10 +155,14 @@
 
 <Spit>
   <Spit_Info>
-    <Job_Name f="id readonly"/>
-    <Trench_ID f="id readonly"/>
-    <author/>
-    <Spit_ID f="id autonum"/>
+    <Spit_Job_Name f="readonly noannotation nocertainty">
+      Job Name
+    </Spit_Job_Name>
+    <Spit_Trench_ID f="id readonly noannotation nocertainty">
+      Trench ID
+    </Spit_Trench_ID>
+    <author f="noannotation nocertainty"/>
+    <Spit_ID f="id notnull autonum noannotation nocertainty"/>
     <Bucket_Count b="decimal"/>
     <Thickness/>
     <Artefact_Count b="decimal"/>
@@ -148,114 +182,231 @@
   Photograph Log
   <Photograph_log>
     Photograph Log
-    <Job_Name f="id readonly"/>
-    <Trench_ID f="id readonly"/>
-    <author f="readonly"/>
-    <timestamp f="readonly"/>
-    <Photograph_reference_ID f="notnull"/>
-    <Description/>
+    <PL_Job_Name f="id readonly noannotation nocertainty">
+      Job Name
+    </PL_Job_Name>
+    <PL_Trench_ID f="id readonly noannotation nocertainty">
+      Trench ID
+    </PL_Trench_ID>
+    <author f="readonly noannotation nocertainty"/>
+    <timestamp f="readonly noannotation nocertainty"/>
+    <Photograph_reference_ID f="id notnull">
+      Photograph Reference ID
+    </Photograph_reference_ID>
+    <Scene_Type>
+      Description
+    </Scene_Type>
   </Photograph_log>
 </Photograph_log>
 
 <Notes>
   <Notes>
-    <Job_Name f="id readonly noannotation nocertainty"/>
-    <Trench_ID f="id readonly noannotation nocertainty"/>
-    <author f="readonly noannotation nocertainty"/>
-    <timestamp f="readonly noannotation nocertainty"/>
-    <Note_Label f="notnull noannotation nocertainty"/>
+    <N_Job_Name   f=" readonly noannotation nocertainty">
+      Job Name
+    </N_Job_Name>
+    <N_Trench_ID  f=" readonly noannotation nocertainty">
+      Trench ID
+    </N_Trench_ID>
+    <author     f="id readonly noannotation nocertainty"/>
+    <timestamp  f="id readonly noannotation nocertainty"/>
+    <Note_Label f="id          noannotation nocertainty notnull"/>
     <Note/>
   </Notes>
 </Notes>
 
 <Artefact>
   <Artefact>
-    <Spit_ID f="id readonly"/>
-    <Artefact_ID f="id autonum"/>
+    <Artefact_Spit_ID f="id readonly notnull">
+      Spit ID
+      <str>
+        <fmt>$2 - </fmt>
+      </str>
+    </Artefact_Spit_ID>
+    <Artefact_ID f="id autonum notnull">
+      <str>
+        <fmt>$2 - </fmt>
+      </str>
+    </Artefact_ID>
     <X b="decimal"/>
     <Y b="decimal"/>
     <Z b="decimal"/>
     <Description/>
-    <Artefact_Class f="notnull">
-      <lookup>
-        <term>{No_Observation}
-          <description>data not collected</description>
-        </term>
-        <term>
-          {Chipped_Stone}
-          <term>{Blade}</term>
-          <term>{Core}</term>
-          <term>{Cache}</term>
-          <term>{Other}</term>
-        </term>
-        <term>{Ground_Stone}
-          <term>{Bead}</term>
-          <term>{Grinder}</term>
-          <term>{Pestle}</term>
-          <term>{Shaft_Straightener}</term>
-          <term>{Pendant}</term>
-          <term>{Incised_Stone}</term>
-          <term>{Polisher}</term>
-          <term>{Other}</term>
-        </term>
-        <term>{Bone}
-          <term>{Point}</term>
-          <term>{Bead}</term>
-          <term>{Other}</term>
-        </term>
-        <term>{Shell}
-          <term>{Bead}</term>
-          <term>{Other}</term>
-        </term>
-        <term>{Plant}
-          <term>{Charcoal}</term>
-          <term>{Hackberry}</term>
-          <term>{Charred_Seed}</term>
-          <term>{Siliceous_Material}</term>
-          <term>{Phytolith}</term>
-          <term>{Impression_Cast}</term>
-          <term>{Other}</term>
-        </term>
-        <term>{Ochre}</term>
-        <term>{Clay_Object}
-          <term>{Figurine}</term>
-          <term>{Geometric_object}</term>
-          <term>{Token}</term>
-          <term>{Other}</term>
-        </term>
-        <term>{Ceramic}
-          <term>{Coarse}</term>
-          <term>{Fine}</term>
-          <term>{Terracotta}</term>
-          <term>{Other}</term>
-        </term>
-        <term>{Glass}
-          <term>{Black}</term>
-          <term>{Colourless}</term>
-          <term>{Coloured}</term>
-        </term>
-        <term>{Metal}
-          <term>{Ferrous}</term>
-          <term>{Copper_alloy}</term>
-          <term>{Other}</term>
-        </term>
-        <term>{Building_Materials}</term>
-        <term>{Miscellaneous}
-          <description>Add detail in the Annotation field</description>
-        </term>
-      </lookup>
+    <Artefact_Class f="id notnull notnull">
+      <str>
+        <fmt>$1</fmt>
+      </str>
+      <opts>
+        <opt>No Observation
+          <desc>data not collected</desc>
+        </opt>
+        <opt>Chipped Stone
+          <opt>Blade</opt>
+          <opt>Core</opt>
+          <opt>Cache</opt>
+          <opt>Other</opt>
+        </opt>
+        <opt>Ground Stone
+          <opt>Bead</opt>
+          <opt>Grinder</opt>
+          <opt>Pestle</opt>
+          <opt>Shaft Straightener</opt>
+          <opt>Pendant</opt>
+          <opt>Incised Stone</opt>
+          <opt>Polisher</opt>
+          <opt>Other</opt>
+        </opt>
+        <opt>Bone
+          <opt>Point</opt>
+          <opt>Bead</opt>
+          <opt>Other</opt>
+        </opt>
+        <opt>Shell
+          <opt>Bead</opt>
+          <opt>Other</opt>
+        </opt>
+        <opt>Plant
+          <opt>Charcoal</opt>
+          <opt>Hackberry</opt>
+          <opt>Charred Seed</opt>
+          <opt>Siliceous Material</opt>
+          <opt>Phytolith</opt>
+          <opt>Impression Cast</opt>
+          <opt>Other</opt>
+        </opt>
+        <opt>Ochre</opt>
+        <opt>Clay Object
+          <opt>Figurine</opt>
+          <opt>Geometric object</opt>
+          <opt>Token</opt>
+          <opt>Other</opt>
+        </opt>
+        <opt>Ceramic
+          <opt>Coarse</opt>
+          <opt>Fine</opt>
+          <opt>Terracotta</opt>
+          <opt>Other</opt>
+        </opt>
+        <opt>Glass
+          <opt>Black</opt>
+          <opt>Colourless</opt>
+          <opt>Coloured</opt>
+        </opt>
+        <opt>Metal
+          <opt>Ferrous</opt>
+          <opt>Copper-alloy</opt>
+          <opt>Other</opt>
+        </opt>
+        <opt>Building Materials</opt>
+        <opt>Miscellaneous
+          <desc>Add detail in the Annotation field</desc>
+        </opt>
+      </opts>
     </Artefact_Class>
     <Artefact_Measurement/>
   </Artefact>
 </Artefact>
 
 <logic><![CDATA[
-
 //Checking they have the correct projection EPSG:28355: GDA94 / MGA zone 55
 checkProjection() {
-     showWarning("Projection Alert","You are using projection EPSG " + getModuleSrid() + ". To change the projection, do the following:\n1. Log into the FAIMS Web Server.\n2. Open this module.\n3. Click edit module.\n4. Change the value in the \"Module SRID:\" to a projection of your choice.");
+  showWarning("Projection Alert","You are using projection EPSG " + getModuleSrid() + ". To change the projection, do the following:\n1. Log into the FAIMS Web Server.\n2. Open this module.\n3. Click edit module.\n4. Change the value in the \"Module SRID:\" to a projection of your choice.");
+}
+checkProjection();
+
+/********************************* VALIDATION *********************************/
+boolean validateJobName() {
+  String ref = "Control/Excavation_Data/Job_Name";
+  String val = getFieldValue(ref);
+
+  if (isNull(val)) {
+    String head  = "Validation Error";
+    String body  = "You must fill in the Job Name before you can create a ";
+           body += "Trench";
+
+    showWarning(head, body);
+
+    return false;
+  }
+
+  return true;
 }
 
-checkProjection();
+// Overrides autogenerated definition
+void onClickControlNewTrench () {
+  if (!validateJobName()) {
+    return;
+  }
+  parentTabgroup__ = "Control";
+  newTrench();
+}
+
+// Overrides autogenerated definition
+void onClickControlNewSpit () {
+  if (!validateJobName()) {
+    return;
+  }
+  parentTabgroup__ = "Control";
+  newSpit();
+}
+
+/******************************** INHERITANCE *********************************/
+void copyTrenchJobName() {
+  copyFieldValue(
+      "Control/Excavation_Data/Job_Name",
+      "Trench/Trench_Info/Job_Name",
+      false
+  );
+}
+
+void copySpitJobName() {
+  copyFieldValue(
+      "Control/Excavation_Data/Job_Name",
+      "Spit/Spit_Info/Spit_Job_Name",
+      false
+  );
+}
+
+addOnEvent("Trench", "create", "copyTrenchJobName()");
+addOnEvent("Spit",   "create", "copySpitJobName()");
+
+/************************* FILL SLOPE DETAILS BUTTON **************************/
+void showSlopeTab(boolean onLoad) {
+  String q = "";
+  q += " SELECT vocabid";
+  q += " FROM   vocabulary";
+  q += " JOIN   attributekey USING (attributeid)";
+  q += " WHERE  attributename = 'Landform Element'";
+  q += " AND    vocabname = '{Slope__add_Slope_Details_}'";
+
+
+  FetchCallback cb = new FetchCallback() {
+    onFetch(result) {
+      if (result == null) return;
+      for(vocabid : getFieldValue("Trench/Trench_Info/Landform_Element")) {
+        if(vocabid.getName().equals(result.get(0))) {
+          showTab("Trench/Slope");
+          if(onLoad) {
+            showTab("Trench/Trench_Info");
+          }
+          return;
+        }
+        if(onLoad) {
+          showTab("Trench/Slope");
+        } else {
+          cancelTab("Trench/Slope", false);
+          showToast("Slope was not selected in Landform Element");
+        }
+      }
+    }
+    onError(message) {
+      showToast(message);
+    }
+  };
+
+  fetchOne(q, cb);
+}
+
+addOnEvent("Trench/Trench_Info/Fill_Slope_Details", "click", "showSlopeTab(false)");
+addOnEvent("Trench",                                "fetch", "showSlopeTab(true )");
 ]]></logic>
 </module>
