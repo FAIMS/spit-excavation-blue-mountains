@@ -129,26 +129,26 @@
               <List_of_Artefacts/>
             </Artefacts>
           </Spit>
-          <Photograph_log>
-            <Photograph_log>
-              <PL_Job_Name/>
-              <PL_Trench_ID/>
+          <Photograph_Log>
+            <Photograph_Log>
+              <Photograph_Log_Job_Name/>
+              <Photograph_Log_Trench_ID/>
               <author/>
               <timestamp/>
-              <Photograph_reference_ID/>
-              <Scene_Type/>
-            </Photograph_log>
-          </Photograph_log>
-          <Notes>
-            <Notes>
-              <N_Job_Name/>
-              <N_Trench_ID/>
+              <Photograph_Reference_ID/>
+              <Photograph_Log_Description/>
+            </Photograph_Log>
+          </Photograph_Log>
+          <Note>
+            <Note>
+              <Note_Job_Name/>
+              <Note_Trench_ID/>
               <author/>
               <timestamp/>
               <Note_Label/>
               <Note/>
-            </Notes>
-          </Notes>
+            </Note>
+          </Note>
           <Artefact>
             <Artefact>
               <Artefact_Spit_ID/>
@@ -156,7 +156,7 @@
               <X/>
               <Y/>
               <Z/>
-              <Description/>
+              <Artefact_Description/>
               <Artefact_Class/>
               <Artefact_Measurement/>
             </Artefact>
@@ -526,57 +526,61 @@
           <label>{Color_Name}</label>
         </input>
       </group>
-      <group ref="Artefacts">
+      <group ref="Artefacts" faims_scrollable="false">
         <label>{Artefacts}</label>
-        <input faims_attribute_type="measure" ref="New_Artefact" faims_attribute_name="New Artefact">
+        <trigger ref="New_Artefact">
           <label>{New_Artefact}</label>
-        </input>
-        <input faims_attribute_type="measure" ref="List_of_Artefacts" faims_attribute_name="List of Artefacts">
+        </trigger>
+        <select1 appearance="compact" ref="List_of_Artefacts" faims_annotation="false" faims_certainty="false">
           <label>{List_of_Artefacts}</label>
-        </input>
+          <item>
+            <label>Options not loaded</label>
+            <value>0</value>
+          </item>
+        </select1>
       </group>
     </group>
-    <group ref="Photograph_log" faims_archent_type="Photograph log">
+    <group ref="Photograph_Log" faims_archent_type="Photograph Log">
       <label>{Photograph_Log}</label>
-      <group ref="Photograph_log">
+      <group ref="Photograph_Log">
         <label>{Photograph_Log}</label>
-        <input faims_attribute_type="measure" ref="PL_Job_Name" faims_attribute_name="PL Job Name" faims_read_only="true" faims_certainty="false" faims_annotation="false">
+        <input faims_attribute_type="measure" ref="Photograph_Log_Job_Name" faims_attribute_name="Photograph Log Job Name" faims_read_only="true" faims_certainty="false" faims_annotation="false">
           <label>{Job_Name}</label>
         </input>
-        <input faims_attribute_type="measure" ref="PL_Trench_ID" faims_attribute_name="PL Trench ID" faims_read_only="true" faims_certainty="false" faims_annotation="false">
+        <input faims_attribute_type="measure" ref="Photograph_Log_Trench_ID" faims_attribute_name="Photograph Log Trench ID" faims_read_only="true" faims_certainty="false" faims_annotation="false">
           <label>{Trench_ID}</label>
         </input>
-        <input ref="author" faims_attribute_name="Photograph_log author" faims_attribute_type="measure" faims_read_only="true" faims_annotation="false" faims_certainty="false">
+        <input ref="author" faims_attribute_name="Photograph_Log author" faims_attribute_type="measure" faims_read_only="true" faims_annotation="false" faims_certainty="false">
           <label>{author}</label>
           <!--WARNING: Flags ignored-->
         </input>
-        <input ref="timestamp" faims_attribute_name="Photograph_log timestamp" faims_attribute_type="measure" faims_read_only="true" faims_annotation="false" faims_certainty="false">
+        <input ref="timestamp" faims_attribute_name="Photograph_Log timestamp" faims_attribute_type="measure" faims_read_only="true" faims_annotation="false" faims_certainty="false">
           <label>{timestamp}</label>
           <!--WARNING: Flags ignored-->
         </input>
-        <input faims_attribute_type="measure" ref="Photograph_reference_ID" faims_attribute_name="Photograph reference ID" faims_style_class="required">
+        <input faims_attribute_type="measure" ref="Photograph_Reference_ID" faims_attribute_name="Photograph Reference ID" faims_style_class="required">
           <label>{Photograph_Reference_ID}</label>
         </input>
-        <input faims_attribute_type="measure" ref="Scene_Type" faims_attribute_name="Scene Type">
+        <input faims_attribute_type="measure" ref="Photograph_Log_Description" faims_attribute_name="Photograph Log Description">
           <label>{Description}</label>
         </input>
       </group>
     </group>
-    <group ref="Notes" faims_archent_type="Notes">
-      <label>{Notes}</label>
-      <group ref="Notes">
-        <label>{Notes}</label>
-        <input faims_attribute_type="measure" ref="N_Job_Name" faims_attribute_name="N Job Name" faims_read_only="true" faims_certainty="false" faims_annotation="false">
+    <group ref="Note" faims_archent_type="Note">
+      <label>{Note}</label>
+      <group ref="Note">
+        <label>{Note}</label>
+        <input faims_attribute_type="measure" ref="Note_Job_Name" faims_attribute_name="Note Job Name" faims_read_only="true" faims_certainty="false" faims_annotation="false">
           <label>{Job_Name}</label>
         </input>
-        <input faims_attribute_type="measure" ref="N_Trench_ID" faims_attribute_name="N Trench ID" faims_read_only="true" faims_certainty="false" faims_annotation="false">
+        <input faims_attribute_type="measure" ref="Note_Trench_ID" faims_attribute_name="Note Trench ID" faims_read_only="true" faims_certainty="false" faims_annotation="false">
           <label>{Trench_ID}</label>
         </input>
-        <input ref="author" faims_attribute_name="Notes author" faims_attribute_type="measure" faims_read_only="true" faims_annotation="false" faims_certainty="false">
+        <input ref="author" faims_attribute_name="Note author" faims_attribute_type="measure" faims_read_only="true" faims_annotation="false" faims_certainty="false">
           <label>{author}</label>
           <!--WARNING: Flags ignored-->
         </input>
-        <input ref="timestamp" faims_attribute_name="Notes timestamp" faims_attribute_type="measure" faims_read_only="true" faims_annotation="false" faims_certainty="false">
+        <input ref="timestamp" faims_attribute_name="Note timestamp" faims_attribute_type="measure" faims_read_only="true" faims_annotation="false" faims_certainty="false">
           <label>{timestamp}</label>
           <!--WARNING: Flags ignored-->
         </input>
@@ -607,7 +611,7 @@
         <input faims_attribute_type="measure" ref="Z" faims_attribute_name="Z">
           <label>{Z}</label>
         </input>
-        <input faims_attribute_type="measure" ref="Description" faims_attribute_name="Description">
+        <input faims_attribute_type="measure" ref="Artefact_Description" faims_attribute_name="Artefact Description">
           <label>{Description}</label>
         </input>
         <select1 faims_attribute_type="vocab" ref="Artefact_Class" faims_attribute_name="Artefact Class" faims_style_class="required">

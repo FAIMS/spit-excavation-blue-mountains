@@ -141,12 +141,12 @@
     <List_of_Spits t="list"   ec="Spit"/>
   </Spits>
   <PhotoLog f="noscroll">
-    <New_Photograph_Log      t="button" lc="Photograph_log"/>
-    <List_of_Photograph_Logs t="list"   ec="Photograph_log"/>
+    <New_Photograph_Log      t="button" lc="Photograph_Log"/>
+    <List_of_Photograph_Logs t="list"   ec="Photograph_Log"/>
   </PhotoLog>
   <Notes f="noscroll">
-    <New_Note      t="button" lc="Notes"/>
-    <List_of_Notes t="list"   ec="Notes"/>
+    <New_Note      t="button" lc="Note"/>
+    <List_of_Notes t="list"   ec="Note"/>
   </Notes>
   <Vars f="hidden">
     <timestamp/>
@@ -157,9 +157,17 @@
   <Spit_Info>
     <Spit_Job_Name f="readonly noannotation nocertainty">
       Job Name
+      <str>
+        <pos>2</pos>
+        <fmt>Spit ID: $2</fmt>
+      </str>
     </Spit_Job_Name>
     <Spit_Trench_ID f="id readonly noannotation nocertainty">
       Trench ID
+      <str>
+        <pos>1</pos>
+        <fmt>Trench ID: $2 </fmt>
+      </str>
     </Spit_Trench_ID>
     <author f="noannotation nocertainty"/>
     <Spit_ID f="id notnull autonum noannotation nocertainty"/>
@@ -172,47 +180,58 @@
     <Pantone_ID/>
     <Color_Name/>
   </Spit_Info>
-  <Artefacts>
-    <New_Artefact/>
-    <List_of_Artefacts/>
+  <Artefacts f="noscroll">
+    <New_Artefact      t="button" lc="Artefact"/>
+    <List_of_Artefacts t="list"   ec="Artefact"/>
   </Artefacts>
 </Spit>
 
-<Photograph_log>
-  Photograph Log
-  <Photograph_log>
-    Photograph Log
-    <PL_Job_Name f="id readonly noannotation nocertainty">
+<Photograph_Log>
+  <Photograph_Log>
+    <Photograph_Log_Job_Name f="readonly noannotation nocertainty">
       Job Name
-    </PL_Job_Name>
-    <PL_Trench_ID f="id readonly noannotation nocertainty">
+    </Photograph_Log_Job_Name>
+    <Photograph_Log_Trench_ID f="readonly noannotation nocertainty">
       Trench ID
-    </PL_Trench_ID>
+    </Photograph_Log_Trench_ID>
     <author f="readonly noannotation nocertainty"/>
     <timestamp f="readonly noannotation nocertainty"/>
-    <Photograph_reference_ID f="id notnull">
-      Photograph Reference ID
-    </Photograph_reference_ID>
-    <Scene_Type>
+    <Photograph_Reference_ID f="id notnull"/>
+    <Photograph_Log_Description>
       Description
-    </Scene_Type>
-  </Photograph_log>
-</Photograph_log>
+    </Photograph_Log_Description>
+  </Photograph_Log>
+</Photograph_Log>
 
-<Notes>
-  <Notes>
-    <N_Job_Name   f=" readonly noannotation nocertainty">
+<Note>
+  <Note>
+    <Note_Job_Name   f=" readonly noannotation nocertainty">
       Job Name
-    </N_Job_Name>
-    <N_Trench_ID  f=" readonly noannotation nocertainty">
+    </Note_Job_Name>
+    <Note_Trench_ID  f=" readonly noannotation nocertainty">
       Trench ID
-    </N_Trench_ID>
-    <author     f="id readonly noannotation nocertainty"/>
-    <timestamp  f="id readonly noannotation nocertainty"/>
-    <Note_Label f="id          noannotation nocertainty notnull"/>
+    </Note_Trench_ID>
+    <author     f="id readonly noannotation nocertainty">
+      <str>
+        <pos>2</pos>
+        <fmt>$2 - </fmt>
+      </str>
+    </author>
+    <timestamp  f="id readonly noannotation nocertainty">
+      <str>
+        <pos>3</pos>
+        <fmt>$2</fmt>
+      </str>
+    </timestamp>
+    <Note_Label f="id          noannotation nocertainty notnull">
+      <str>
+        <pos>1</pos>
+        <fmt>$2 - </fmt>
+      </str>
+    </Note_Label>
     <Note/>
-  </Notes>
-</Notes>
+  </Note>
+</Note>
 
 <Artefact>
   <Artefact>
@@ -230,7 +249,9 @@
     <X b="decimal"/>
     <Y b="decimal"/>
     <Z b="decimal"/>
-    <Description/>
+    <Artefact_Description>
+      Description
+    </Artefact_Description>
     <Artefact_Class f="id notnull notnull">
       <str>
         <fmt>$1</fmt>
@@ -360,14 +381,68 @@ void copyTrenchJobName() {
 
 void copySpitJobName() {
   copyFieldValue(
-      "Control/Excavation_Data/Job_Name",
+      "Trench/Trench_Info/Job_Name",
       "Spit/Spit_Info/Spit_Job_Name",
       false
   );
 }
 
-addOnEvent("Trench", "create", "copyTrenchJobName()");
-addOnEvent("Spit",   "create", "copySpitJobName()");
+void copyPhotographLogJobName() {
+  copyFieldValue(
+      "Trench/Trench_Info/Job_Name",
+      "Photograph_Log/Photograph_Log/Photograph_Log_Job_Name",
+      false
+  );
+}
+
+void copyNoteJobName() {
+  copyFieldValue(
+      "Trench/Trench_Info/Job_Name",
+      "Note/Note/Note_Job_Name",
+      false
+  );
+}
+
+void copySpitTrenchId() {
+  copyFieldValue(
+      "Trench/Trench_Info/Trench_ID",
+      "Spit/Spit_Info/Spit_Trench_ID",
+      false
+  );
+}
+
+void copyPhotographLogTrenchId() {
+  copyFieldValue(
+      "Trench/Trench_Info/Trench_ID",
+      "Photograph_Log/Photograph_Log/Photograph_Log_Trench_ID",
+      false
+  );
+}
+
+void copyNoteTrenchId() {
+  copyFieldValue(
+      "Trench/Trench_Info/Trench_ID",
+      "Note/Note/Note_Trench_ID",
+      false
+  );
+}
+
+void copyArtefactSpitId() {
+  copyFieldValue(
+      "Spit/Spit_Info/Spit_ID",
+      "Artefact/Artefact/Artefact_Spit_ID",
+      false
+  );
+}
+
+addOnEvent("Artefact",       "create", "copyArtefactSpitId()");
+addOnEvent("Note",           "create", "copyNoteJobName()");
+addOnEvent("Note",           "create", "copyNoteTrenchId()");
+addOnEvent("Photograph_Log", "create", "copyPhotographLogJobName()");
+addOnEvent("Photograph_Log", "create", "copyPhotographLogTrenchId()");
+addOnEvent("Spit",           "create", "copySpitJobName()");
+addOnEvent("Spit",           "create", "copySpitTrenchId()");
+addOnEvent("Trench",         "create", "copyTrenchJobName()");
 
 /************************* FILL SLOPE DETAILS BUTTON **************************/
 void showSlopeTab(boolean onLoad) {
