@@ -121,7 +121,7 @@ void persistOverSessions(String ref) {
   insertIntoLocalSettingsOnChange     (ref);
 }
 
-/**************************** FIELD COPYING HELPER ****************************/
+/*************************** FIELD COPYING HELPERS ****************************/
 /* Provides an easy way to copy field values, even between vocabs.            */
 /******************************************************************************/
 void copyFieldValue(String src, String dst) {
@@ -179,6 +179,19 @@ void copyFieldValue(String src, String dst, Boolean doFindVocabId) {
   fetchOne(q, populate);
 }
 
+void inheritFieldValue(String src, String dst, boolean doFindVocabId) {
+  String fun = "";
+  fun = "copyFieldValue(\"{src}\", \"{dst}\", false)";
+  fun = replaceFirst(fun, "{src}", src);
+  fun = replaceFirst(fun, "{dst}", dst);
+
+  addOnEvent(getTabGroupRef(dst), "create", fun);
+}
+
+void inheritFieldValue(String src, String dst) {
+  inheritFieldValue(src, dst, false);
+}
+
 newTab(String tab, Boolean resolveTabGroups) {
   if (!resolveTabGroups) {
     return newTab(tab);
@@ -220,6 +233,7 @@ List getTabGroups() {
   tabGroups.add("User");
   tabGroups.add("Control");
   tabGroups.add("Trench");
+  tabGroups.add("Unit");
   tabGroups.add("Spit");
   tabGroups.add("Photograph_Log");
   tabGroups.add("Note");
@@ -506,17 +520,24 @@ for (tg : getTabGroups()) {
 /*                                                                            */
 /* For consistency with `getListItemValue()`.                                 */
 /******************************************************************************/
-String dropdownItemValue = null;
+String DROPDOWN_ITEM_VALUE = null;
 
-getDropdownItemValue() {
-  return dropdownItemValue;
+String getDropdownItemValue() {
+  return DROPDOWN_ITEM_VALUE;
 }
 
-addOnEvent("Trench/Trench_Info/Dimensions", "click", "dropdownItemValue = getFieldValue(\"Trench/Trench_Info/Dimensions\")");
-addOnEvent("Trench/Trench_Info/Geomorphic_Context", "click", "dropdownItemValue = getFieldValue(\"Trench/Trench_Info/Geomorphic_Context\")");
-addOnEvent("Trench/Slope/Slope_Detail", "click", "dropdownItemValue = getFieldValue(\"Trench/Slope/Slope_Detail\")");
-addOnEvent("Trench/Slope/Slope_Detail_2", "click", "dropdownItemValue = getFieldValue(\"Trench/Slope/Slope_Detail_2\")");
-addOnEvent("Artefact/Artefact/Artefact_Class", "click", "dropdownItemValue = getFieldValue(\"Artefact/Artefact/Artefact_Class\")");
+addOnEvent("Trench/Trench_Info/Dimensions", "click", "DROPDOWN_ITEM_VALUE = getFieldValue(\"Trench/Trench_Info/Dimensions\")");
+addOnEvent("Trench/Trench_Info/Geomorphic_Context", "click", "DROPDOWN_ITEM_VALUE = getFieldValue(\"Trench/Trench_Info/Geomorphic_Context\")");
+addOnEvent("Trench/Slope/Slope_Detail", "click", "DROPDOWN_ITEM_VALUE = getFieldValue(\"Trench/Slope/Slope_Detail\")");
+addOnEvent("Trench/Slope/Slope_Detail_2", "click", "DROPDOWN_ITEM_VALUE = getFieldValue(\"Trench/Slope/Slope_Detail_2\")");
+addOnEvent("Unit/Soil/Texture", "click", "DROPDOWN_ITEM_VALUE = getFieldValue(\"Unit/Soil/Texture\")");
+addOnEvent("Unit/Soil/Moisture", "click", "DROPDOWN_ITEM_VALUE = getFieldValue(\"Unit/Soil/Moisture\")");
+addOnEvent("Unit/Soil/Grain_size", "click", "DROPDOWN_ITEM_VALUE = getFieldValue(\"Unit/Soil/Grain_size\")");
+addOnEvent("Unit/Soil/Consistency", "click", "DROPDOWN_ITEM_VALUE = getFieldValue(\"Unit/Soil/Consistency\")");
+addOnEvent("Unit/Soil/Cementation", "click", "DROPDOWN_ITEM_VALUE = getFieldValue(\"Unit/Soil/Cementation\")");
+addOnEvent("Unit/Grass_Roots/Root_Size", "click", "DROPDOWN_ITEM_VALUE = getFieldValue(\"Unit/Grass_Roots/Root_Size\")");
+addOnEvent("Unit/Grass_Roots/Root_Abundance", "click", "DROPDOWN_ITEM_VALUE = getFieldValue(\"Unit/Grass_Roots/Root_Abundance\")");
+addOnEvent("Artefact/Artefact/Artefact_Class", "click", "DROPDOWN_ITEM_VALUE = getFieldValue(\"Artefact/Artefact/Artefact_Class\")");
 
 /******************************************************************************/
 /*                             MENU VALUE GETTER                              */
@@ -531,7 +552,7 @@ Map MENU_VALUES = null;
  * Initialises `MENU_VALUES` with the (vocabid -> vocabname) mapping of every
  * menu.
  */
-fetchMenuValues() {
+void fetchMenuValues() {
   MENU_VALUES = new HashMap();
 
   String q = "";
@@ -555,7 +576,7 @@ fetchMenuValues();
 
 /* Returns a menu's vocabname, instead of the (counter-intuitive) vocabid.
  */
-getFieldValue(String ref, Boolean doConvertVocabIds) {
+String getFieldValue(String ref, Boolean doConvertVocabIds) {
   if (!doConvertVocabIds) {
     return getFieldValue(ref);
   }
@@ -571,7 +592,7 @@ getFieldValue(String ref, Boolean doConvertVocabIds) {
 /* Shorthand for writing getFieldValue(ref, true). This function's use is
  * discouraged in favour of writing `getFieldValue(ref, true)`.
  */
-getMenuValue(String ref) {
+String getMenuValue(String ref) {
   return getFieldValue(ref, true);
 }
 
@@ -673,7 +694,7 @@ addActionBarItem("external_gps", new ToggleActionButtonCallback() {
 /*                                    GPS                                     */
 /******************************************************************************/
 
-updateGPSDiagnostics() {
+void updateGPSDiagnostics() {
   String diagnosticsRef = "";
   if (diagnosticsRef.equals("")) {
     return;
@@ -901,6 +922,16 @@ makeVocab("DropDown", "Trench/Trench_Info/Geomorphic_Context", "Geomorphic Conte
 makeVocab("CheckBoxGroup", "Trench/Trench_Info/Samples_Collected", "Samples Collected");
 makeVocab("DropDown", "Trench/Slope/Slope_Detail", "Slope Detail");
 makeVocab("DropDown", "Trench/Slope/Slope_Detail_2", "Slope Detail 2");
+makeVocab("HierarchicalDropDown", "Unit/Soil/Texture", "Texture");
+makeVocab("DropDown", "Unit/Soil/Moisture", "Moisture");
+makeVocab("DropDown", "Unit/Soil/Grain_size", "Grain size");
+makeVocab("DropDown", "Unit/Soil/Consistency", "Consistency");
+makeVocab("DropDown", "Unit/Soil/Cementation", "Cementation");
+makeVocab("CheckBoxGroup", "Unit/Soil/Inclusions", "Inclusions");
+makeVocab("CheckBoxGroup", "Unit/Soil/Disturbance", "Disturbance");
+makeVocab("RadioGroup", "Unit/Soil/Artefacts", "Artefacts");
+makeVocab("DropDown", "Unit/Grass_Roots/Root_Size", "Root Size");
+makeVocab("DropDown", "Unit/Grass_Roots/Root_Abundance", "Root Abundance");
 makeVocab("HierarchicalDropDown", "Artefact/Artefact/Artefact_Class", "Artefact Class");
 
 
@@ -915,7 +946,7 @@ makeVocab("HierarchicalDropDown", "Artefact/Artefact/Artefact_Class", "Artefact 
  *
  *  Returns a field pair (really just an ArrayList).
  */
-fieldPair(String ref, String name, String cond) {
+List fieldPair(String ref, String name, String cond) {
   List fp = new ArrayList();
   fp.add(ref);
   fp.add(name);
@@ -923,19 +954,19 @@ fieldPair(String ref, String name, String cond) {
   return fp;
 }
 
-fieldPair(String ref, String name) {
+List fieldPair(String ref, String name) {
   String t = "true";
   return fieldPair(ref, name, t);
 }
 
 /* Returns true if field specified by `ref` is valid. False otherwise.
  */
-isValidField(String ref) {
+boolean isValidField(String ref) {
   return !isNull(getFieldValue(ref));
 }
 /* `format` can either be HTML or PLAINTEXT
  */
-validateFields(List fields, String format) {
+String validateFields(List fields, String format) {
   Integer numInvalid = 0;
 
   /* Build validation message string (and count how many invalid fields exist) */
@@ -970,7 +1001,7 @@ validateFields(List fields, String format) {
   return out;
 }
 
-validateTrench() {
+void validateTrench() {
   List f = new ArrayList(); // Fields to be validated
 
   f.add(fieldPair("Trench/Trench_Info/Trench_ID", "{Trench_ID}"));
@@ -979,7 +1010,17 @@ validateTrench() {
   showWarning("Validation Results", validationMessage);
 }
 
-validateSpit() {
+void validateUnit() {
+  List f = new ArrayList(); // Fields to be validated
+
+  f.add(fieldPair("Unit/Soil/Unit_ID", "{Unit_ID}"));
+  f.add(fieldPair("Unit/Soil/Horizon", "{Horizon}"));
+
+  String validationMessage = validateFields(f, "PLAINTEXT");
+  showWarning("Validation Results", validationMessage);
+}
+
+void validateSpit() {
   List f = new ArrayList(); // Fields to be validated
 
   f.add(fieldPair("Spit/Spit_Info/Spit_ID", "{Spit_ID}"));
@@ -988,7 +1029,7 @@ validateSpit() {
   showWarning("Validation Results", validationMessage);
 }
 
-validatePhotographLog() {
+void validatePhotographLog() {
   List f = new ArrayList(); // Fields to be validated
 
   f.add(fieldPair("Photograph_Log/Photograph_Log/Photograph_Reference_ID", "{Photograph_Reference_ID}"));
@@ -997,7 +1038,7 @@ validatePhotographLog() {
   showWarning("Validation Results", validationMessage);
 }
 
-validateNote() {
+void validateNote() {
   List f = new ArrayList(); // Fields to be validated
 
   f.add(fieldPair("Note/Note/Note_Label", "{Note_Label}"));
@@ -1006,7 +1047,7 @@ validateNote() {
   showWarning("Validation Results", validationMessage);
 }
 
-validateArtefact() {
+void validateArtefact() {
   List f = new ArrayList(); // Fields to be validated
 
   f.add(fieldPair("Artefact/Artefact/Artefact_Spit_ID", "{Spit_ID}"));
@@ -1123,6 +1164,7 @@ void populateAuthorAndTimestamp(String tabgroup) {
   Map tabgroupToAuthor    = new HashMap();
   Map tabgroupToTimestamp = new HashMap();
   tabgroupToAuthor.put("Trench", "Trench/Trench_Info/author");
+  tabgroupToAuthor.put("Unit", "Unit/Soil/author");
   tabgroupToAuthor.put("Spit", "Spit/Spit_Info/author");
   tabgroupToAuthor.put("Photograph_Log", "Photograph_Log/Photograph_Log/author");
   tabgroupToAuthor.put("Note", "Note/Note/author");
@@ -1144,6 +1186,10 @@ void onShowTrench () {
   // TODO: Add some things which should happen when this tabgroup is shown
   saveTabGroup("Trench");
 }
+void onShowUnit () {
+  // TODO: Add some things which should happen when this tabgroup is shown
+  saveTabGroup("Unit");
+}
 void onShowSpit () {
   // TODO: Add some things which should happen when this tabgroup is shown
   saveTabGroup("Spit");
@@ -1162,6 +1208,7 @@ void onShowArtefact () {
 }
 
 addOnEvent("Trench", "show", "onShowTrench()");
+addOnEvent("Unit", "show", "onShowUnit()");
 addOnEvent("Spit", "show", "onShowSpit()");
 addOnEvent("Photograph_Log", "show", "onShowPhotographLog()");
 addOnEvent("Note", "show", "onShowNote()");
@@ -1180,6 +1227,17 @@ void onClickControlNewSpit () {
   // TODO: Add some things which should happen when this element is clicked
   parentTabgroup__ = "Control";
   newSpit();
+}
+void onClickTrenchNewUnit () {
+  // TODO: Add some things which should happen when this element is clicked
+  String tabgroup = "Trench";
+  if (isNull(getUuid(tabgroup))){
+    showToast("{You_must_save_this_tabgroup_first}");
+    return;
+  }
+  parentTabgroup   = tabgroup;
+  parentTabgroup__ = tabgroup;
+  newUnit();
 }
 void onClickTrenchNewSpit () {
   // TODO: Add some things which should happen when this element is clicked
@@ -1229,6 +1287,7 @@ void onClickSpitNewArtefact () {
 addOnEvent("User/User/Select_User", "click", "onClickUserSelectUser()");
 addOnEvent("Control/Excavation_Data/New_Trench", "click", "onClickControlNewTrench()");
 addOnEvent("Control/Spits/New_Spit", "click", "onClickControlNewSpit()");
+addOnEvent("Trench/Units/New_Unit", "click", "onClickTrenchNewUnit()");
 addOnEvent("Trench/Spits/New_Spit", "click", "onClickTrenchNewSpit()");
 addOnEvent("Trench/PhotoLog/New_Photograph_Log", "click", "onClickTrenchNewPhotographLog()");
 addOnEvent("Trench/Notes/New_Note", "click", "onClickTrenchNewNote()");
@@ -1250,17 +1309,18 @@ addOnEvent("Trench/Trench_Info/View_Attached_Files", "click", "viewArchEntAttach
 /******************************************************************************/
 /*                             NAVIGATION DRAWER                              */
 /******************************************************************************/
-removeNavigationButtons() {
+void removeNavigationButtons() {
   removeNavigationButton("new");
   removeNavigationButton("duplicate");
   removeNavigationButton("delete");
   removeNavigationButton("validate");
 }
 
-addNavigationButtons(String tabgroup) {
+void addNavigationButtons(String tabgroup) {
   removeNavigationButtons();
   List tabgroupsToValidate = new ArrayList();
   tabgroupsToValidate.add("Trench");
+  tabgroupsToValidate.add("Unit");
   tabgroupsToValidate.add("Spit");
   tabgroupsToValidate.add("Photograph_Log");
   tabgroupsToValidate.add("Note");
@@ -1614,6 +1674,138 @@ void reallyDeleteTrench(){
   cancelTabGroup(tabgroup, false);
   populateEntityListsOfArchEnt(tabgroup);
   onDeleteTrench__();
+}
+
+void newUnit(){
+  String tabgroup = "Unit";
+
+  String autoNumSource = "";
+  autoNumSource = getFieldValue("Control/Excavation_Data/Next_Unit_ID");
+  if (isNull(autoNumSource)) {
+    showWarning("{Alert}","{A_next_ID_has_not_been_entered_please_provide_one}");
+    return;
+  }
+
+  setUuid(tabgroup, null);
+  newTabGroup(tabgroup);
+  populateAuthorAndTimestamp(tabgroup);
+  populateEntityListsInTabGroup(tabgroup);
+  String autoNumDest = "";
+  autoNumDest = "Unit/Soil/Unit_ID";
+  incAutoNum(autoNumDest);
+  onCreateUnit__();
+
+  // WARNING: The default behaviour of calling `onCreateUnit()` upon entity creation is deprecated in this version of FAIMS Tools. If you never implemented this function, this warning can safely be ignored.
+}
+
+
+void onCreateUnit__(){
+  String ref      = "Unit";
+  String event    = "create";
+  String stmtsStr = getStatementsString(ref, event);
+  execute(stmtsStr);
+}
+
+
+// Triggered after an existing record is loaded.
+void onFetchUnit__(){
+  String ref      = "Unit";
+  String event    = "fetch";
+  String stmtsStr = getStatementsString(ref, event);
+  execute(stmtsStr);
+}
+
+
+// Triggered after an existing record is saved.
+void onSaveUnit__(){
+  String ref      = "Unit";
+  String event    = "save";
+  String stmtsStr = getStatementsString(ref, event);
+  execute(stmtsStr);
+}
+
+addOnEvent("Unit", "save", "populateEntityListsOfArchEnt(\"Unit\")");
+
+// Triggered as a record is duplicated but before it's saved.
+void onCopyUnit__(){
+  String ref      = "Unit";
+  String event    = "copy";
+  String stmtsStr = getStatementsString(ref, event);
+  execute(stmtsStr);
+}
+
+
+void onDeleteUnit__(){
+  String ref      = "Unit";
+  String event    = "delete";
+  String stmtsStr = getStatementsString(ref, event);
+  execute(stmtsStr);
+}
+
+void duplicateUnit(){
+  String tabgroup = "Unit";
+  String uuidOld = getUuid(tabgroup);
+
+  disableAutoSave(tabgroup);
+  String autoNumDest = "";
+  autoNumDest = "Unit/Soil/Unit_ID";
+  incAutoNum(autoNumDest);
+
+  clearGpsInTabGroup(tabgroup);
+  populateAuthorAndTimestamp(tabgroup);
+
+  onCopyUnit__();
+
+  saveCallback = new SaveCallback() {
+    onSave(uuid, newRecord) {
+      setUuid(tabgroup, uuid);
+
+      fetchAll(getDuplicateRelnQuery(uuidOld), new FetchCallback(){
+        onFetch(result) {
+          Log.e("Module", result.toString());
+
+          if (result != null && result.size() >= 1) {
+            parentTabgroup__ = result.get(0).get(4);
+            parentTabgroup__ = parentTabgroup__.replaceAll(" ", "_");
+          }
+
+          makeDuplicateRelationships(result, getUuid(tabgroup));
+
+          showToast("{Duplicated_record}");
+          dialog.dismiss();
+        }
+      });
+
+      saveTabGroup(tabgroup);
+    }
+  };
+
+  String extraDupeAttributes = "";
+  fetchAll(getDuplicateAttributeQuery(getUuid(tabgroup), extraDupeAttributes), new FetchCallback(){
+    onFetch(result) {
+      excludeAttributes = new ArrayList();
+
+      duplicateTabGroup(tabgroup, null, getExtraAttributes(result), excludeAttributes, saveCallback);
+    }
+  });
+}
+
+void deleteUnit(){
+  String tabgroup = "Unit";
+
+  if (isNull(getUuid(tabgroup))) {
+    cancelTabGroup(tabgroup, true);
+  } else {
+    showAlert("{Confirm_Deletion}", "{Press_OK_to_Delete_this_Record}", "reallyDeleteUnit()", "doNotDelete()");
+  }
+}
+
+void reallyDeleteUnit(){
+  String tabgroup = "Unit";
+  deleteArchEnt(getUuid(tabgroup));
+  cancelTabGroup(tabgroup, false);
+  populateEntityListsOfArchEnt(tabgroup);
+  onDeleteUnit__();
 }
 
 void newSpit(){
@@ -2129,6 +2321,7 @@ void doNotDelete(){
 addOnEvent("User", "show", "removeNavigationButtons()");
 addOnEvent("Control", "show", "removeNavigationButtons()");
 addOnEvent("Trench", "show", "addNavigationButtons(\"Trench\")");
+addOnEvent("Unit", "show", "addNavigationButtons(\"Unit\")");
 addOnEvent("Spit", "show", "addNavigationButtons(\"Spit\")");
 addOnEvent("Photograph_Log", "show", "addNavigationButtons(\"Photograph_Log\")");
 addOnEvent("Note", "show", "addNavigationButtons(\"Note\")");
@@ -2146,6 +2339,7 @@ addOnEvent("Control/Search/Entity_Types"  , "click" , "search()");
 entityTypes = new ArrayList();
 entityTypes.add(new NameValuePair("{All}", ""));
 entityTypes.add(new NameValuePair("{Trench}", "Trench"));
+entityTypes.add(new NameValuePair("{Unit}", "Unit"));
 entityTypes.add(new NameValuePair("{Spit}", "Spit"));
 entityTypes.add(new NameValuePair("{Photograph_Log}", "Photograph Log"));
 entityTypes.add(new NameValuePair("{Note}", "Note"));
@@ -2191,6 +2385,22 @@ void loadTrenchFrom(String uuid) {
       populateEntityListsInTabGroup(tabgroup);
       // WARNING: The default behaviour of calling `onFetchTrench()` upon fetching an entity is deprecated in this version of FAIMS Tools. If you never implemented this function, this warning can safely be ignored.
       onFetchTrench__();
+    }
+  };
+
+  showTabGroup(tabgroup, uuid, cb);
+}
+
+void loadUnitFrom(String uuid) {
+  String tabgroup = "Unit";
+  setUuid(tabgroup, uuid);
+  if (isNull(uuid)) return;
+
+  FetchCallback cb = new FetchCallback() {
+    onFetch(result) {
+      populateEntityListsInTabGroup(tabgroup);
+      // WARNING: The default behaviour of calling `onFetchUnit()` upon fetching an entity is deprecated in this version of FAIMS Tools. If you never implemented this function, this warning can safely be ignored.
+      onFetchUnit__();
     }
   };
 
@@ -2268,7 +2478,7 @@ void loadArtefactFrom(String uuid) {
 addOnEvent("Trench/Trench_Info/Take_From_GPS", "click", "takePoint(\"Trench\")");
 
 /* Takes the current point using gps. */
-takePoint(String tabgroup) {
+void takePoint(String tabgroup) {
   Map tabgroupToTabRef = new HashMap();
   tabgroupToTabRef.put("Trench", "Trench/Trench_Info/");
 
@@ -2309,7 +2519,7 @@ takePoint(String tabgroup) {
 }
 
 /* Sets the value of GPS views for the given tab path. */
-fillInGPS(String tabgroup) {
+void fillInGPS(String tabgroup) {
   Map tabgroupToTabRef = new HashMap();
   tabgroupToTabRef.put("Trench", "Trench/Trench_Info/");
 
@@ -2336,7 +2546,7 @@ fillInGPS(String tabgroup) {
   });
 }
 
-clearGpsInTabGroup(String tabgroup) {
+void clearGpsInTabGroup(String tabgroup) {
   Map tabgroupToTabRef = new HashMap();
   tabgroupToTabRef.put("Trench", "Trench/Trench_Info/");
 
@@ -2347,7 +2557,7 @@ clearGpsInTabGroup(String tabgroup) {
   clearGpsInTab(tabRef);
 }
 
-clearGpsInTab(String tabRef) {
+void clearGpsInTab(String tabRef) {
   setFieldValue(tabRef + "Accuracy"  , "");
   setFieldValue(tabRef + "Latitude"  , "");
   setFieldValue(tabRef + "Longitude" , "");
@@ -2364,7 +2574,7 @@ clearGpsInTab(String tabRef) {
  *
  * Returns the value the field was updated to.
  */
-incField(String ref, Integer defaultVal) {
+Integer incField(String ref, Integer defaultVal) {
   String val = getFieldValue(ref);
 
   if (isNull(val)) {
@@ -2382,19 +2592,20 @@ incField(String ref, Integer defaultVal) {
 /* Increments the field at `ref` or returns null if it does not contain a
  * number.
  */
-incField(String ref) {
+Integer incField(String ref) {
   return incField(ref, 1);
 }
 
-getStartingIdPaths() {
+List getStartingIdPaths() {
   List l = new ArrayList();
+  l.add("Control/Excavation_Data/Next_Unit_ID");
   l.add("Control/Excavation_Data/Next_Spit_ID");
   l.add("Control/Excavation_Data/Next_Artefact_ID");
 
   return l;
 }
 
-loadStartingId(String ref) {
+void loadStartingId(String ref) {
   // If there's already a value in the field, we don't need to load one.
   String val = getFieldValue(ref);
   if (!isNull(val)) {
@@ -2429,8 +2640,9 @@ for (ref : getStartingIdPaths()) {
   onFocus(ref, null, "insertIntoLocalSettings(\"" + ref + "\", getFieldValue(\"" + ref + "\"));");
 }
 
-incAutoNum(String destPath) {
+void incAutoNum(String destPath) {
   Map destToSource = new HashMap();
+  destToSource.put("Unit/Soil/Unit_ID", "Control/Excavation_Data/Next_Unit_ID");
   destToSource.put("Spit/Spit_Info/Spit_ID", "Control/Excavation_Data/Next_Spit_ID");
   destToSource.put("Artefact/Artefact/Artefact_ID", "Control/Excavation_Data/Next_Artefact_ID");
 
@@ -2576,6 +2788,13 @@ ENTITY_MENUS.add(new String[] {
 });
 ENTITY_MENUS.add(new String[] {
   "List",
+  "Trench/Units/List_of_Units",
+  "getUuid(\"Trench\")",
+  "Unit",
+  "Trench - Unit",
+});
+ENTITY_MENUS.add(new String[] {
+  "List",
   "Trench/Spits/List_of_Spits",
   "getUuid(\"Trench\")",
   "Spit",
@@ -2610,6 +2829,7 @@ for (m : ENTITY_MENUS) {
 }
 addOnEvent("Control/Excavation_Data/List_of_Trenches", "click", "loadEntity()");
 addOnEvent("Control/Spits/List_of_Spits", "click", "loadEntity()");
+addOnEvent("Trench/Units/List_of_Units", "click", "loadEntity()");
 addOnEvent("Trench/Spits/List_of_Spits", "click", "loadEntity()");
 addOnEvent("Trench/PhotoLog/List_of_Photograph_Logs", "click", "loadEntity()");
 addOnEvent("Trench/Notes/List_of_Notes", "click", "loadEntity()");
@@ -2662,78 +2882,56 @@ void onClickControlNewSpit () {
 }
 
 /******************************** INHERITANCE *********************************/
-void copyTrenchJobName() {
-  copyFieldValue(
-      "Control/Excavation_Data/Job_Name",
-      "Trench/Trench_Info/Job_Name",
-      false
-  );
-}
 
-void copySpitJobName() {
-  copyFieldValue(
-      "Trench/Trench_Info/Job_Name",
-      "Spit/Spit_Info/Spit_Job_Name",
-      false
-  );
-}
+inheritFieldValue(
+    "Control/Excavation_Data/Job_Name",
+    "Trench/Trench_Info/Job_Name"
+);
 
-void copyPhotographLogJobName() {
-  copyFieldValue(
-      "Trench/Trench_Info/Job_Name",
-      "Photograph_Log/Photograph_Log/Photograph_Log_Job_Name",
-      false
-  );
-}
+inheritFieldValue(
+    "Trench/Trench_Info/Job_Name",
+    "Unit/Soil/Unit_Job_Name"
+);
 
-void copyNoteJobName() {
-  copyFieldValue(
-      "Trench/Trench_Info/Job_Name",
-      "Note/Note/Note_Job_Name",
-      false
-  );
-}
+inheritFieldValue(
+    "Trench/Trench_Info/Job_Name",
+    "Spit/Spit_Info/Spit_Job_Name"
+);
 
-void copySpitTrenchId() {
-  copyFieldValue(
-      "Trench/Trench_Info/Trench_ID",
-      "Spit/Spit_Info/Spit_Trench_ID",
-      false
-  );
-}
+inheritFieldValue(
+    "Trench/Trench_Info/Job_Name",
+    "Photograph_Log/Photograph_Log/Photograph_Log_Job_Name"
+);
 
-void copyPhotographLogTrenchId() {
-  copyFieldValue(
-      "Trench/Trench_Info/Trench_ID",
-      "Photograph_Log/Photograph_Log/Photograph_Log_Trench_ID",
-      false
-  );
-}
+inheritFieldValue(
+    "Trench/Trench_Info/Job_Name",
+    "Note/Note/Note_Job_Name"
+);
 
-void copyNoteTrenchId() {
-  copyFieldValue(
-      "Trench/Trench_Info/Trench_ID",
-      "Note/Note/Note_Trench_ID",
-      false
-  );
-}
+inheritFieldValue(
+    "Trench/Trench_Info/Trench_ID",
+    "Unit/Soil/Unit_Trench_ID"
+);
 
-void copyArtefactSpitId() {
-  copyFieldValue(
-      "Spit/Spit_Info/Spit_ID",
-      "Artefact/Artefact/Artefact_Spit_ID",
-      false
-  );
-}
+inheritFieldValue(
+    "Trench/Trench_Info/Trench_ID",
+    "Spit/Spit_Info/Spit_Trench_ID"
+);
 
-addOnEvent("Artefact",       "create", "copyArtefactSpitId()");
-addOnEvent("Note",           "create", "copyNoteJobName()");
-addOnEvent("Note",           "create", "copyNoteTrenchId()");
-addOnEvent("Photograph_Log", "create", "copyPhotographLogJobName()");
-addOnEvent("Photograph_Log", "create", "copyPhotographLogTrenchId()");
-addOnEvent("Spit",           "create", "copySpitJobName()");
-addOnEvent("Spit",           "create", "copySpitTrenchId()");
-addOnEvent("Trench",         "create", "copyTrenchJobName()");
+inheritFieldValue(
+    "Trench/Trench_Info/Trench_ID",
+    "Photograph_Log/Photograph_Log/Photograph_Log_Trench_ID"
+);
+
+inheritFieldValue(
+    "Trench/Trench_Info/Trench_ID",
+    "Note/Note/Note_Trench_ID"
+);
+
+inheritFieldValue(
+    "Spit/Spit_Info/Spit_ID",
+    "Artefact/Artefact/Artefact_Spit_ID"
+);
 
 /************************* FILL SLOPE DETAILS BUTTON **************************/
 void showSlopeTab(boolean onLoad) {
@@ -2743,7 +2941,6 @@ void showSlopeTab(boolean onLoad) {
   q += " JOIN   attributekey USING (attributeid)";
   q += " WHERE  attributename = 'Landform Element'";
   q += " AND    vocabname = '{Slope__add_Slope_Details_}'";
-
 
   FetchCallback cb = new FetchCallback() {
     onFetch(result) {
@@ -2772,8 +2969,50 @@ void showSlopeTab(boolean onLoad) {
   fetchOne(q, cb);
 }
 
-addOnEvent("Trench/Trench_Info/Fill_Slope_Details", "click", "showSlopeTab(false)");
-addOnEvent("Trench",                                "fetch", "showSlopeTab(true )");
+addOnEvent("Trench/Trench_Info/Fill_Slope_Details", "click",  "showSlopeTab(false)");
+addOnEvent("Trench",                                "fetch",  "showSlopeTab(true )");
+addOnEvent("Trench",                                "create", "cancelTab(\"Trench/Slope\", false)");
+
+/********************* FILL IN GRASS ROOTS DETAILS BUTTON *********************/
+
+showGrassRootsTab(Boolean onLoad) {
+  String q = "";
+  q += " SELECT vocabid";
+  q += " FROM   vocabulary";
+  q += " JOIN   attributekey USING (attributeid)";
+  q += " WHERE  attributename = 'Inclusions'";
+  q += " AND    vocabname = '{Grass_roots__add_Grass_roots_details_}'";
+
+  fetchOne(q, new FetchCallback() {
+    onFetch(result) {
+      if (result == null) return;
+      for(vocabid : getFieldValue("Unit/Soil/Inclusions")) {
+        if(vocabid.getName().equals(result.get(0))) {
+          showTab("Unit/Grass_Roots");
+          if(onLoad) {
+            showTab("Unit/Soil");
+          }
+          return;
+        }
+        if(!onLoad) {
+          showToast("Grass Roots was not selected in Inclusions");
+        } else {
+          showTab("Unit/Grass_Roots");
+          cancelTab("Unit/Grass_Roots", false);
+        }
+      }
+    }
+
+    onError(message) {
+      showToast(message);
+    }
+  });
+}
+
+addOnEvent("Unit/Soil/Fill_in_Grass_Roots_Details", "click",  "showGrassRootsTab(false)");
+addOnEvent("Unit",                                  "fetch",  "showGrassRootsTab(true )");
+addOnEvent("Unit",                                  "create", "cancelTab(\"Unit/Grass_Roots\", false)");
+
 
 /******************************************************************************/
 /*                                    INIT                                    */

@@ -99,7 +99,9 @@
       </opts>
     </Geomorphic_Context>
     <Aspect/>
-    <Distance_To_Water/>
+    <Distance_to_Water_km b="decimal">
+      Distance to Water (km)
+    </Distance_to_Water_km>
     <Samples_Collected t="checkbox">
       <opts>
         <opt>Soil</opt>
@@ -113,8 +115,12 @@
     <Attach_Sketches t="file"/>
     <View_Attached_Files t="viewfiles"/>
   </Trench_Info>
+  <Units f="noscroll">
+    <New_Unit      t="button" lc="Unit"/>
+    <List_of_Units t="list"   ec="Unit"/>
+  </Units>
   <Slope f="hidden">
-    <Slope_Degree/>
+    <Slope_Degree b="decimal"/>
     <Slope_Detail>
       <opts>
         <opt>No Observation</opt>
@@ -153,14 +159,139 @@
   </Vars>
 </Trench>
 
+<Unit>
+  <Soil>
+    <Unit_Job_Name  f="readonly">
+      Job Name
+    </Unit_Job_Name>
+    <Unit_Trench_ID f="readonly">
+      Trench ID
+    </Unit_Trench_ID>
+    <author  f="readonly"/>
+    <Unit_ID f="id autonum notnull">
+      <str><fmt>$2 - </fmt></str>
+    </Unit_ID>
+    <Horizon f="id notnull">
+      <str><fmt>$2</fmt></str>
+    </Horizon>
+    <Depth_cm b="decimal">
+      Depth (cm)
+    </Depth_cm>
+    <pH b="decimal"/>
+    <Colour/>
+    <Texture>
+      <opts>
+        <opt>No Observation</opt>
+        <opt>Sand
+          <opt>Loamy Sand</opt>
+          <opt>Clayey Sand</opt>
+          <opt>Silty Sand</opt>
+        </opt>
+        <opt>Clay
+          <opt>Sandy Clay</opt>
+          <opt>Silty Clay</opt>
+        </opt>
+        <opt>Loam
+          <opt>Loam</opt>
+          <opt>Sandy Loam</opt>
+          <opt>Silty Clay Loam</opt>
+          <opt>Sandy Clay Loam</opt>
+          <opt>Clay Loam</opt>
+          <opt>Clay Loam Sandy</opt>
+          <opt>Silty Clay Loam</opt>
+        </opt>
+      </opts>
+    </Texture>
+    <Moisture>
+      <opts>
+        <opt>No Observation</opt>
+        <opt>Dry</opt>
+        <opt>Moderately moist</opt>
+        <opt>Moist</opt>
+        <opt>Wet</opt>
+      </opts>
+    </Moisture>
+    <Grain_size>
+      <opts>
+        <opt>No Observation</opt>
+        <opt>Very fine</opt>
+        <opt>Fine</opt>
+        <opt>Medium</opt>
+        <opt>Coarse</opt>
+      </opts>
+    </Grain_size>
+    <Consistency>
+      <opts>
+        <opt>No Observation</opt>
+        <opt>Loose</opt>
+        <opt>Soft/friable</opt>
+        <opt>Hard/Firm</opt>
+        <opt>Extremely Hard</opt>
+      </opts>
+    </Consistency>
+    <Cementation>
+      <opts>
+        <opt>No Observation</opt>
+        <opt>Weakly cemented</opt>
+        <opt>Strongly cemented</opt>
+      </opts>
+    </Cementation>
+    <Inclusions t="checkbox">
+      <opts>
+        <opt>No Observation</opt>
+        <opt>Charcoal</opt>
+        <opt>Grass roots (add Grass roots details)</opt>
+        <opt>Tree roots</opt>
+        <opt>Gravel</opt>
+        <opt>Mineral pan</opt>
+        <opt>Other (add annotation)</opt>
+      </opts>
+    </Inclusions>
+    <Fill_in_Grass_Roots_Details t="button"/>
+    <Disturbance t="checkbox">
+      <opts>
+        <opt>Ploughing</opt>
+        <opt>Bioturbation</opt>
+        <opt>Stock trampling</opt>
+        <opt>Burrows</opt>
+        <opt>Other (add annotation)</opt>
+      </opts>
+    </Disturbance>
+    <Artefacts t="radio">
+      <opts>
+        <opt>No Observation</opt>
+        <opt>Yes</opt>
+        <opt>No</opt>
+      </opts>
+    </Artefacts>
+    <Unit_Notes/>
+  </Soil>
+  <Grass_Roots f="hidden">
+    <Root_Size>
+      <opts>
+        <opt>No Observation</opt>
+        <opt>Very fine</opt>
+        <opt>Fine</opt>
+        <opt>Medium</opt>
+        <opt>Coarse</opt>
+      </opts>
+    </Root_Size>
+    <Root_Abundance>
+      <opts>
+        <opt>No Observation</opt>
+        <opt>Few</opt>
+        <opt>Common</opt>
+        <opt>Many</opt>
+        <opt>Abundant</opt>
+      </opts>
+    </Root_Abundance>
+  </Grass_Roots>
+</Unit>
+
 <Spit>
   <Spit_Info>
     <Spit_Job_Name f="readonly noannotation nocertainty">
       Job Name
-      <str>
-        <pos>2</pos>
-        <fmt>Spit ID: $2</fmt>
-      </str>
     </Spit_Job_Name>
     <Spit_Trench_ID f="id readonly noannotation nocertainty">
       Trench ID
@@ -170,13 +301,18 @@
       </str>
     </Spit_Trench_ID>
     <author f="noannotation nocertainty"/>
-    <Spit_ID f="id notnull autonum noannotation nocertainty"/>
+    <Spit_ID f="id notnull autonum noannotation nocertainty">
+      <str>
+        <pos>2</pos>
+        <fmt>Spit ID: $2</fmt>
+      </str>
+    </Spit_ID>
     <Bucket_Count b="decimal"/>
-    <Thickness/>
-    <Artefact_Count b="decimal"/>
-    <Artefact_Type/>
+    <Thickness b="decimal">
+      Thickness (m)
+    </Thickness>
     <Attach_Photograph t="camera"/>
-    <Notes/>
+    <Spit_Notes/>
     <Pantone_ID/>
     <Color_Name/>
   </Spit_Info>
@@ -238,12 +374,12 @@
     <Artefact_Spit_ID f="id readonly notnull">
       Spit ID
       <str>
-        <fmt>$2 - </fmt>
+        <fmt>Spit ID: $2 - </fmt>
       </str>
     </Artefact_Spit_ID>
     <Artefact_ID f="id autonum notnull">
       <str>
-        <fmt>$2 - </fmt>
+        <fmt>Artefact ID: $2 - </fmt>
       </str>
     </Artefact_ID>
     <X b="decimal"/>
@@ -323,7 +459,10 @@
         </opt>
       </opts>
     </Artefact_Class>
-    <Artefact_Measurement/>
+    <Artefact_Measurement_cm>
+      Artefact Measurement (cm)
+    </Artefact_Measurement_cm>
+    <Artefact_Notes/>
   </Artefact>
 </Artefact>
 
@@ -371,78 +510,56 @@ void onClickControlNewSpit () {
 }
 
 /******************************** INHERITANCE *********************************/
-void copyTrenchJobName() {
-  copyFieldValue(
-      "Control/Excavation_Data/Job_Name",
-      "Trench/Trench_Info/Job_Name",
-      false
-  );
-}
 
-void copySpitJobName() {
-  copyFieldValue(
-      "Trench/Trench_Info/Job_Name",
-      "Spit/Spit_Info/Spit_Job_Name",
-      false
-  );
-}
+inheritFieldValue(
+    "Control/Excavation_Data/Job_Name",
+    "Trench/Trench_Info/Job_Name"
+);
 
-void copyPhotographLogJobName() {
-  copyFieldValue(
-      "Trench/Trench_Info/Job_Name",
-      "Photograph_Log/Photograph_Log/Photograph_Log_Job_Name",
-      false
-  );
-}
+inheritFieldValue(
+    "Trench/Trench_Info/Job_Name",
+    "Unit/Soil/Unit_Job_Name"
+);
 
-void copyNoteJobName() {
-  copyFieldValue(
-      "Trench/Trench_Info/Job_Name",
-      "Note/Note/Note_Job_Name",
-      false
-  );
-}
+inheritFieldValue(
+    "Trench/Trench_Info/Job_Name",
+    "Spit/Spit_Info/Spit_Job_Name"
+);
 
-void copySpitTrenchId() {
-  copyFieldValue(
-      "Trench/Trench_Info/Trench_ID",
-      "Spit/Spit_Info/Spit_Trench_ID",
-      false
-  );
-}
+inheritFieldValue(
+    "Trench/Trench_Info/Job_Name",
+    "Photograph_Log/Photograph_Log/Photograph_Log_Job_Name"
+);
 
-void copyPhotographLogTrenchId() {
-  copyFieldValue(
-      "Trench/Trench_Info/Trench_ID",
-      "Photograph_Log/Photograph_Log/Photograph_Log_Trench_ID",
-      false
-  );
-}
+inheritFieldValue(
+    "Trench/Trench_Info/Job_Name",
+    "Note/Note/Note_Job_Name"
+);
 
-void copyNoteTrenchId() {
-  copyFieldValue(
-      "Trench/Trench_Info/Trench_ID",
-      "Note/Note/Note_Trench_ID",
-      false
-  );
-}
+inheritFieldValue(
+    "Trench/Trench_Info/Trench_ID",
+    "Unit/Soil/Unit_Trench_ID"
+);
 
-void copyArtefactSpitId() {
-  copyFieldValue(
-      "Spit/Spit_Info/Spit_ID",
-      "Artefact/Artefact/Artefact_Spit_ID",
-      false
-  );
-}
+inheritFieldValue(
+    "Trench/Trench_Info/Trench_ID",
+    "Spit/Spit_Info/Spit_Trench_ID"
+);
 
-addOnEvent("Artefact",       "create", "copyArtefactSpitId()");
-addOnEvent("Note",           "create", "copyNoteJobName()");
-addOnEvent("Note",           "create", "copyNoteTrenchId()");
-addOnEvent("Photograph_Log", "create", "copyPhotographLogJobName()");
-addOnEvent("Photograph_Log", "create", "copyPhotographLogTrenchId()");
-addOnEvent("Spit",           "create", "copySpitJobName()");
-addOnEvent("Spit",           "create", "copySpitTrenchId()");
-addOnEvent("Trench",         "create", "copyTrenchJobName()");
+inheritFieldValue(
+    "Trench/Trench_Info/Trench_ID",
+    "Photograph_Log/Photograph_Log/Photograph_Log_Trench_ID"
+);
+
+inheritFieldValue(
+    "Trench/Trench_Info/Trench_ID",
+    "Note/Note/Note_Trench_ID"
+);
+
+inheritFieldValue(
+    "Spit/Spit_Info/Spit_ID",
+    "Artefact/Artefact/Artefact_Spit_ID"
+);
 
 /************************* FILL SLOPE DETAILS BUTTON **************************/
 void showSlopeTab(boolean onLoad) {
@@ -452,7 +569,6 @@ void showSlopeTab(boolean onLoad) {
   q += " JOIN   attributekey USING (attributeid)";
   q += " WHERE  attributename = 'Landform Element'";
   q += " AND    vocabname = '{Slope__add_Slope_Details_}'";
-
 
   FetchCallback cb = new FetchCallback() {
     onFetch(result) {
@@ -481,7 +597,49 @@ void showSlopeTab(boolean onLoad) {
   fetchOne(q, cb);
 }
 
-addOnEvent("Trench/Trench_Info/Fill_Slope_Details", "click", "showSlopeTab(false)");
-addOnEvent("Trench",                                "fetch", "showSlopeTab(true )");
+addOnEvent("Trench/Trench_Info/Fill_Slope_Details", "click",  "showSlopeTab(false)");
+addOnEvent("Trench",                                "fetch",  "showSlopeTab(true )");
+addOnEvent("Trench",                                "create", "cancelTab(\"Trench/Slope\", false)");
+
+/********************* FILL IN GRASS ROOTS DETAILS BUTTON *********************/
+
+showGrassRootsTab(Boolean onLoad) {
+  String q = "";
+  q += " SELECT vocabid";
+  q += " FROM   vocabulary";
+  q += " JOIN   attributekey USING (attributeid)";
+  q += " WHERE  attributename = 'Inclusions'";
+  q += " AND    vocabname = '{Grass_roots__add_Grass_roots_details_}'";
+
+  fetchOne(q, new FetchCallback() {
+    onFetch(result) {
+      if (result == null) return;
+      for(vocabid : getFieldValue("Unit/Soil/Inclusions")) {
+        if(vocabid.getName().equals(result.get(0))) {
+          showTab("Unit/Grass_Roots");
+          if(onLoad) {
+            showTab("Unit/Soil");
+          }
+          return;
+        }
+        if(!onLoad) {
+          showToast("Grass Roots was not selected in Inclusions");
+        } else {
+          showTab("Unit/Grass_Roots");
+          cancelTab("Unit/Grass_Roots", false);
+        }
+      }
+    }
+
+    onError(message) {
+      showToast(message);
+    }
+  });
+}
+
+addOnEvent("Unit/Soil/Fill_in_Grass_Roots_Details", "click",  "showGrassRootsTab(false)");
+addOnEvent("Unit",                                  "fetch",  "showGrassRootsTab(true )");
+addOnEvent("Unit",                                  "create", "cancelTab(\"Unit/Grass_Roots\", false)");
+
 ]]></logic>
 </module>
