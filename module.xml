@@ -15,8 +15,7 @@
     <List_of_Trenches t="list"   e="Trench"/>
   </Excavation_Data>
   <Spits f="noscroll">
-    <New_Spit      t="button" l="Spit"/>
-    <List_of_Spits t="list"   e="Spit"/>
+    <List_of_Spits t="list" e="Spit"/>
   </Spits>
   <search/>
 </Control>
@@ -257,15 +256,13 @@
         <opt>Other (add annotation)</opt>
       </opts>
     </Disturbance>
-    <Artefacts t="radio">
-      <opts>
-        <opt>No Observation</opt>
-        <opt>Yes</opt>
-        <opt>No</opt>
-      </opts>
-    </Artefacts>
     <Unit_Notes/>
+    <Unit_Photograph t="camera"/>
   </Soil>
+  <Artefacts f="noscroll">
+    <New_Artefact      t="button" lc="Artefact"/>
+    <List_of_Artefacts t="list"   ec="Artefact"/>
+  </Artefacts>
   <Grass_Roots f="hidden">
     <Root_Size>
       <opts>
@@ -385,9 +382,6 @@
     <X b="decimal"/>
     <Y b="decimal"/>
     <Z b="decimal"/>
-    <Artefact_Description>
-      Description
-    </Artefact_Description>
     <Artefact_Class f="id notnull notnull">
       <str>
         <fmt>$1</fmt>
@@ -462,7 +456,10 @@
     <Artefact_Measurement_cm>
       Artefact Measurement (cm)
     </Artefact_Measurement_cm>
-    <Artefact_Notes/>
+    <Artefact_Description>
+      Description
+    </Artefact_Description>
+    <Artefact_Photograph t="camera"/>
   </Artefact>
 </Artefact>
 
@@ -560,6 +557,16 @@ inheritFieldValue(
     "Spit/Spit_Info/Spit_ID",
     "Artefact/Artefact/Artefact_Spit_ID"
 );
+
+/***************************** TRENCH DUPLICATION *****************************/
+
+blankTrenchId() {
+  String ref = "Trench/Trench_Info/Trench_ID";
+  String val = "";
+  setFieldValue(ref, val);
+}
+
+addOnEvent("Trench", "copy", "blankTrenchId()");
 
 /************************* FILL SLOPE DETAILS BUTTON **************************/
 void showSlopeTab(boolean onLoad) {

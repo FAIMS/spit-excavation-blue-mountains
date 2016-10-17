@@ -30,7 +30,7 @@ filenames = [
 username = 'faimsadmin@intersect.org.au'
 password = 'Pass.123'
 
-server = 'dev'
+server = 'test1'
 url    = 'http://%s.fedarch.org' % server
 
 ################################################################################

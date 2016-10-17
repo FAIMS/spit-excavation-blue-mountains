@@ -929,7 +929,6 @@ makeVocab("DropDown", "Unit/Soil/Consistency", "Consistency");
 makeVocab("DropDown", "Unit/Soil/Cementation", "Cementation");
 makeVocab("CheckBoxGroup", "Unit/Soil/Inclusions", "Inclusions");
 makeVocab("CheckBoxGroup", "Unit/Soil/Disturbance", "Disturbance");
-makeVocab("RadioGroup", "Unit/Soil/Artefacts", "Artefacts");
 makeVocab("DropDown", "Unit/Grass_Roots/Root_Size", "Root Size");
 makeVocab("DropDown", "Unit/Grass_Roots/Root_Abundance", "Root Abundance");
 makeVocab("HierarchicalDropDown", "Artefact/Artefact/Artefact_Class", "Artefact Class");
@@ -1223,11 +1222,6 @@ void onClickControlNewTrench () {
   parentTabgroup__ = "Control";
   newTrench();
 }
-void onClickControlNewSpit () {
-  // TODO: Add some things which should happen when this element is clicked
-  parentTabgroup__ = "Control";
-  newSpit();
-}
 void onClickTrenchNewUnit () {
   // TODO: Add some things which should happen when this element is clicked
   String tabgroup = "Trench";
@@ -1272,6 +1266,17 @@ void onClickTrenchNewNote () {
   parentTabgroup__ = tabgroup;
   newNote();
 }
+void onClickUnitNewArtefact () {
+  // TODO: Add some things which should happen when this element is clicked
+  String tabgroup = "Unit";
+  if (isNull(getUuid(tabgroup))){
+    showToast("{You_must_save_this_tabgroup_first}");
+    return;
+  }
+  parentTabgroup   = tabgroup;
+  parentTabgroup__ = tabgroup;
+  newArtefact();
+}
 void onClickSpitNewArtefact () {
   // TODO: Add some things which should happen when this element is clicked
   String tabgroup = "Spit";
@@ -1286,11 +1291,11 @@ void onClickSpitNewArtefact () {
 
 addOnEvent("User/User/Select_User", "click", "onClickUserSelectUser()");
 addOnEvent("Control/Excavation_Data/New_Trench", "click", "onClickControlNewTrench()");
-addOnEvent("Control/Spits/New_Spit", "click", "onClickControlNewSpit()");
 addOnEvent("Trench/Units/New_Unit", "click", "onClickTrenchNewUnit()");
 addOnEvent("Trench/Spits/New_Spit", "click", "onClickTrenchNewSpit()");
 addOnEvent("Trench/PhotoLog/New_Photograph_Log", "click", "onClickTrenchNewPhotographLog()");
 addOnEvent("Trench/Notes/New_Note", "click", "onClickTrenchNewNote()");
+addOnEvent("Unit/Artefacts/New_Artefact", "click", "onClickUnitNewArtefact()");
 addOnEvent("Spit/Artefacts/New_Artefact", "click", "onClickSpitNewArtefact()");
 
 
@@ -1298,7 +1303,9 @@ addOnEvent("Spit/Artefacts/New_Artefact", "click", "onClickSpitNewArtefact()");
 /*                   AUDIO, CAMERA, FILE AND VIDEO BINDINGS                   */
 /******************************************************************************/
 addOnEvent("Trench/Trench_Info/Button_Take_Photo", "click", "attachPictureTo(\"Trench/Trench_Info/Take_Photo\")");
+addOnEvent("Unit/Soil/Button_Unit_Photograph", "click", "attachPictureTo(\"Unit/Soil/Unit_Photograph\")");
 addOnEvent("Spit/Spit_Info/Button_Attach_Photograph", "click", "attachPictureTo(\"Spit/Spit_Info/Attach_Photograph\")");
+addOnEvent("Artefact/Artefact/Button_Artefact_Photograph", "click", "attachPictureTo(\"Artefact/Artefact/Artefact_Photograph\")");
 addOnEvent("Trench/Trench_Info/Button_Attach_Sketches", "click", "attachFileTo(\"Trench/Trench_Info/Attach_Sketches\")");
 
 /******************************************************************************/
@@ -1490,7 +1497,7 @@ void makeDuplicateRelationships(fetchedAttributes, String newUuid){
     String parentUuid             = savedAttribute.get(3);
     String childArchEntType       = savedAttribute.get(5);
 
-    String onSaveRel              = "onSave" + childArchEntType + "__()";
+    String onSaveRel              = "onSave" + childArchEntType.replaceAll(" ", "") + "__()";
 
     saveEntitiesToHierRel(
         relntypename,
@@ -1612,11 +1619,13 @@ void onDeleteTrench__(){
 void duplicateTrench(){
   String tabgroup = "Trench";
   String uuidOld = getUuid(tabgroup);
+  setUuid(tabgroup, "");
 
   disableAutoSave(tabgroup);
 
   clearGpsInTabGroup(tabgroup);
   populateAuthorAndTimestamp(tabgroup);
+  populateEntityListsInTabGroup(tabgroup);
   populateCameraPictureGallery("Trench/Trench_Info/Take_Photo", new ArrayList());
   populateFileList("Trench/Trench_Info/Attach_Sketches", new ArrayList());
 
@@ -1647,7 +1656,7 @@ void duplicateTrench(){
   };
 
   String extraDupeAttributes = "";
-  fetchAll(getDuplicateAttributeQuery(getUuid(tabgroup), extraDupeAttributes), new FetchCallback(){
+  fetchAll(getDuplicateAttributeQuery(uuidOld, extraDupeAttributes), new FetchCallback(){
     onFetch(result) {
       excludeAttributes = new ArrayList();
       excludeAttributes.add("Take Photo");
@@ -1745,6 +1754,7 @@ void onDeleteUnit__(){
 void duplicateUnit(){
   String tabgroup = "Unit";
   String uuidOld = getUuid(tabgroup);
+  setUuid(tabgroup, "");
 
   disableAutoSave(tabgroup);
   String autoNumDest = "";
@@ -1753,6 +1763,8 @@ void duplicateUnit(){
 
   clearGpsInTabGroup(tabgroup);
   populateAuthorAndTimestamp(tabgroup);
+  populateEntityListsInTabGroup(tabgroup);
+  populateCameraPictureGallery("Unit/Soil/Unit_Photograph", new ArrayList());
 
   onCopyUnit__();
 
@@ -1781,9 +1793,10 @@ void duplicateUnit(){
   };
 
   String extraDupeAttributes = "";
-  fetchAll(getDuplicateAttributeQuery(getUuid(tabgroup), extraDupeAttributes), new FetchCallback(){
+  fetchAll(getDuplicateAttributeQuery(uuidOld, extraDupeAttributes), new FetchCallback(){
     onFetch(result) {
       excludeAttributes = new ArrayList();
+      excludeAttributes.add("Unit Photograph");
 
       duplicateTabGroup(tabgroup, null, getExtraAttributes(result), excludeAttributes, saveCallback);
     }
@@ -1877,6 +1890,7 @@ void onDeleteSpit__(){
 void duplicateSpit(){
   String tabgroup = "Spit";
   String uuidOld = getUuid(tabgroup);
+  setUuid(tabgroup, "");
 
   disableAutoSave(tabgroup);
   String autoNumDest = "";
@@ -1885,6 +1899,7 @@ void duplicateSpit(){
 
   clearGpsInTabGroup(tabgroup);
   populateAuthorAndTimestamp(tabgroup);
+  populateEntityListsInTabGroup(tabgroup);
   populateCameraPictureGallery("Spit/Spit_Info/Attach_Photograph", new ArrayList());
 
   onCopySpit__();
@@ -1914,7 +1929,7 @@ void duplicateSpit(){
   };
 
   String extraDupeAttributes = "";
-  fetchAll(getDuplicateAttributeQuery(getUuid(tabgroup), extraDupeAttributes), new FetchCallback(){
+  fetchAll(getDuplicateAttributeQuery(uuidOld, extraDupeAttributes), new FetchCallback(){
     onFetch(result) {
       excludeAttributes = new ArrayList();
       excludeAttributes.add("Attach Photograph");
@@ -2002,11 +2017,13 @@ void onDeletePhotographLog__(){
 void duplicatePhotographLog(){
   String tabgroup = "Photograph_Log";
   String uuidOld = getUuid(tabgroup);
+  setUuid(tabgroup, "");
 
   disableAutoSave(tabgroup);
 
   clearGpsInTabGroup(tabgroup);
   populateAuthorAndTimestamp(tabgroup);
+  populateEntityListsInTabGroup(tabgroup);
 
   onCopyPhotographLog__();
 
@@ -2035,7 +2052,7 @@ void duplicatePhotographLog(){
   };
 
   String extraDupeAttributes = "";
-  fetchAll(getDuplicateAttributeQuery(getUuid(tabgroup), extraDupeAttributes), new FetchCallback(){
+  fetchAll(getDuplicateAttributeQuery(uuidOld, extraDupeAttributes), new FetchCallback(){
     onFetch(result) {
       excludeAttributes = new ArrayList();
 
@@ -2122,11 +2139,13 @@ void onDeleteNote__(){
 void duplicateNote(){
   String tabgroup = "Note";
   String uuidOld = getUuid(tabgroup);
+  setUuid(tabgroup, "");
 
   disableAutoSave(tabgroup);
 
   clearGpsInTabGroup(tabgroup);
   populateAuthorAndTimestamp(tabgroup);
+  populateEntityListsInTabGroup(tabgroup);
 
   onCopyNote__();
 
@@ -2155,7 +2174,7 @@ void duplicateNote(){
   };
 
   String extraDupeAttributes = "";
-  fetchAll(getDuplicateAttributeQuery(getUuid(tabgroup), extraDupeAttributes), new FetchCallback(){
+  fetchAll(getDuplicateAttributeQuery(uuidOld, extraDupeAttributes), new FetchCallback(){
     onFetch(result) {
       excludeAttributes = new ArrayList();
 
@@ -2251,6 +2270,7 @@ void onDeleteArtefact__(){
 void duplicateArtefact(){
   String tabgroup = "Artefact";
   String uuidOld = getUuid(tabgroup);
+  setUuid(tabgroup, "");
 
   disableAutoSave(tabgroup);
   String autoNumDest = "";
@@ -2259,6 +2279,8 @@ void duplicateArtefact(){
 
   clearGpsInTabGroup(tabgroup);
   populateAuthorAndTimestamp(tabgroup);
+  populateEntityListsInTabGroup(tabgroup);
+  populateCameraPictureGallery("Artefact/Artefact/Artefact_Photograph", new ArrayList());
 
   onCopyArtefact__();
 
@@ -2287,9 +2309,10 @@ void duplicateArtefact(){
   };
 
   String extraDupeAttributes = "";
-  fetchAll(getDuplicateAttributeQuery(getUuid(tabgroup), extraDupeAttributes), new FetchCallback(){
+  fetchAll(getDuplicateAttributeQuery(uuidOld, extraDupeAttributes), new FetchCallback(){
     onFetch(result) {
       excludeAttributes = new ArrayList();
+      excludeAttributes.add("Artefact Photograph");
 
       duplicateTabGroup(tabgroup, null, getExtraAttributes(result), excludeAttributes, saveCallback);
     }
@@ -2732,6 +2755,9 @@ void populateEntityListsInTabGroup(String tabGroup) {
   }
 }
 
+/* Populates each list containing records whose archent type is the same as that
+ * of `tabGroup`.
+ */
 void populateEntityListsOfArchEnt(String tabGroup) {
   if (isNull(tabGroup)) {
     return;
@@ -2816,6 +2842,13 @@ ENTITY_MENUS.add(new String[] {
 });
 ENTITY_MENUS.add(new String[] {
   "List",
+  "Unit/Artefacts/List_of_Artefacts",
+  "getUuid(\"Unit\")",
+  "Artefact",
+  "Unit - Artefact",
+});
+ENTITY_MENUS.add(new String[] {
+  "List",
   "Spit/Artefacts/List_of_Artefacts",
   "getUuid(\"Spit\")",
   "Artefact",
@@ -2833,6 +2866,7 @@ addOnEvent("Trench/Units/List_of_Units", "click", "loadEntity()");
 addOnEvent("Trench/Spits/List_of_Spits", "click", "loadEntity()");
 addOnEvent("Trench/PhotoLog/List_of_Photograph_Logs", "click", "loadEntity()");
 addOnEvent("Trench/Notes/List_of_Notes", "click", "loadEntity()");
+addOnEvent("Unit/Artefacts/List_of_Artefacts", "click", "loadEntity()");
 addOnEvent("Spit/Artefacts/List_of_Artefacts", "click", "loadEntity()");
 
 /******************************************************************************/
@@ -2932,6 +2966,16 @@ inheritFieldValue(
     "Spit/Spit_Info/Spit_ID",
     "Artefact/Artefact/Artefact_Spit_ID"
 );
+
+/***************************** TRENCH DUPLICATION *****************************/
+
+blankTrenchId() {
+  String ref = "Trench/Trench_Info/Trench_ID";
+  String val = "";
+  setFieldValue(ref, val);
+}
+
+addOnEvent("Trench", "copy", "blankTrenchId()");
 
 /************************* FILL SLOPE DETAILS BUTTON **************************/
 void showSlopeTab(boolean onLoad) {

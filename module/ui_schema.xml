@@ -31,7 +31,6 @@
               <List_of_Trenches/>
             </Excavation_Data>
             <Spits>
-              <New_Spit/>
               <List_of_Spits/>
             </Spits>
             <Search>
@@ -131,9 +130,14 @@
               <Inclusions/>
               <Fill_in_Grass_Roots_Details/>
               <Disturbance/>
-              <Artefacts/>
               <Unit_Notes/>
+              <Unit_Photograph/>
+              <Button_Unit_Photograph/>
             </Soil>
+            <Artefacts>
+              <New_Artefact/>
+              <List_of_Artefacts/>
+            </Artefacts>
             <Grass_Roots>
               <Root_Size/>
               <Root_Abundance/>
@@ -185,10 +189,11 @@
               <X/>
               <Y/>
               <Z/>
-              <Artefact_Description/>
               <Artefact_Class/>
               <Artefact_Measurement_cm/>
-              <Artefact_Notes/>
+              <Artefact_Description/>
+              <Artefact_Photograph/>
+              <Button_Artefact_Photograph/>
             </Artefact>
           </Artefact>
           <logic/>
@@ -275,9 +280,6 @@
       </group>
       <group ref="Spits" faims_scrollable="false">
         <label>{Spits}</label>
-        <trigger ref="New_Spit">
-          <label>{New_Spit}</label>
-        </trigger>
         <select1 appearance="compact" ref="List_of_Spits" faims_annotation="false" faims_certainty="false">
           <label>{List_of_Spits}</label>
           <item>
@@ -610,16 +612,32 @@
             <value>0</value>
           </item>
         </select>
-        <select1 appearance="full" faims_attribute_type="vocab" ref="Artefacts" faims_attribute_name="Artefacts">
-          <label>{Artefacts}</label>
+        <input faims_attribute_type="measure" ref="Unit_Notes" faims_attribute_name="Unit Notes">
+          <label>{Unit_Notes}</label>
+        </input>
+        <select type="camera" faims_attribute_type="measure" faims_sync="true" ref="Unit_Photograph" faims_attribute_name="Unit Photograph">
+          <label>{Unit_Photograph}</label>
+          <item>
+            <label>Options not loaded</label>
+            <value>0</value>
+          </item>
+        </select>
+        <trigger ref="Button_Unit_Photograph">
+          <label>{Button_Unit_Photograph}</label>
+        </trigger>
+      </group>
+      <group ref="Artefacts" faims_scrollable="false">
+        <label>{Artefacts}</label>
+        <trigger ref="New_Artefact">
+          <label>{New_Artefact}</label>
+        </trigger>
+        <select1 appearance="compact" ref="List_of_Artefacts" faims_annotation="false" faims_certainty="false">
+          <label>{List_of_Artefacts}</label>
           <item>
             <label>Options not loaded</label>
             <value>0</value>
           </item>
         </select1>
-        <input faims_attribute_type="measure" ref="Unit_Notes" faims_attribute_name="Unit Notes">
-          <label>{Unit_Notes}</label>
-        </input>
       </group>
       <group ref="Grass_Roots" faims_hidden="true">
         <label>{Grass_Roots}</label>
@@ -767,9 +785,6 @@
         <input faims_attribute_type="measure" ref="Z" faims_attribute_name="Z">
           <label>{Z}</label>
         </input>
-        <input faims_attribute_type="measure" ref="Artefact_Description" faims_attribute_name="Artefact Description">
-          <label>{Description}</label>
-        </input>
         <select1 faims_attribute_type="vocab" ref="Artefact_Class" faims_attribute_name="Artefact Class" faims_style_class="required">
           <label>{Artefact_Class}</label>
           <item>
@@ -780,9 +795,19 @@
         <input faims_attribute_type="measure" ref="Artefact_Measurement_cm" faims_attribute_name="Artefact Measurement cm">
           <label>{Artefact_Measurement__cm_}</label>
         </input>
-        <input faims_attribute_type="measure" ref="Artefact_Notes" faims_attribute_name="Artefact Notes">
-          <label>{Artefact_Notes}</label>
+        <input faims_attribute_type="measure" ref="Artefact_Description" faims_attribute_name="Artefact Description">
+          <label>{Description}</label>
         </input>
+        <select type="camera" faims_attribute_type="measure" faims_sync="true" ref="Artefact_Photograph" faims_attribute_name="Artefact Photograph">
+          <label>{Artefact_Photograph}</label>
+          <item>
+            <label>Options not loaded</label>
+            <value>0</value>
+          </item>
+        </select>
+        <trigger ref="Button_Artefact_Photograph">
+          <label>{Button_Artefact_Photograph}</label>
+        </trigger>
       </group>
     </group>
   </h:body>
