@@ -8,7 +8,7 @@
     </property>
   </ArchaeologicalElement>
   <ArchaeologicalElement name="Unit">
-    <property name="Unit ID">
+    <property name="Unit Unit ID">
       <validator type="blankchecker">
         <param value="measure" type="field"/>
       </validator>
@@ -41,11 +41,6 @@
     </property>
   </ArchaeologicalElement>
   <ArchaeologicalElement name="Artefact">
-    <property name="Artefact Spit ID">
-      <validator type="blankchecker">
-        <param value="measure" type="field"/>
-      </validator>
-    </property>
     <property name="Artefact ID">
       <validator type="blankchecker">
         <param value="measure" type="field"/>

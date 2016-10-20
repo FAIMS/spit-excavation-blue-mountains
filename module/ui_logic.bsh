@@ -179,17 +179,34 @@ void copyFieldValue(String src, String dst, Boolean doFindVocabId) {
   fetchOne(q, populate);
 }
 
-void inheritFieldValue(String src, String dst, boolean doFindVocabId) {
+void inheritFieldValue(
+    String src,
+    String dst,
+    boolean doCheckParent,
+    boolean doFindVocabId
+) {
   String fun = "";
-  fun = "copyFieldValue(\"{src}\", \"{dst}\", false)";
-  fun = replaceFirst(fun, "{src}", src);
-  fun = replaceFirst(fun, "{dst}", dst);
+  fun += "if (!{check} || getDisplayedTabGroup().equals(\"{parent}\"))";
+  fun += "  copyFieldValue(\"{src}\", \"{dst}\", {find})";
+
+  fun = replaceFirst(fun, "{check}",  doCheckParent + "");
+  fun = replaceFirst(fun, "{parent}", getTabGroupRef(src));
+  fun = replaceFirst(fun, "{src}",    src);
+  fun = replaceFirst(fun, "{dst}",    dst);
+  fun = replaceFirst(fun, "{find}",   doFindVocabId + "");
 
   addOnEvent(getTabGroupRef(dst), "create", fun);
 }
 
+/* If `doCheckParent`, then the value at `src` will only be inherited to `dst`
+ * if `getTabGroupRef(src)` was the previously displayed tab group.
+ */
+void inheritFieldValue(String src, String dst, boolean doCheckParent) {
+  inheritFieldValue(src, dst, doCheckParent, false);
+}
+
 void inheritFieldValue(String src, String dst) {
-  inheritFieldValue(src, dst, false);
+  inheritFieldValue(src, dst, true);
 }
 
 newTab(String tab, Boolean resolveTabGroups) {
@@ -1012,7 +1029,7 @@ void validateTrench() {
 void validateUnit() {
   List f = new ArrayList(); // Fields to be validated
 
-  f.add(fieldPair("Unit/Soil/Unit_ID", "{Unit_ID}"));
+  f.add(fieldPair("Unit/Soil/Unit_Unit_ID", "{Unit_ID}"));
   f.add(fieldPair("Unit/Soil/Horizon", "{Horizon}"));
 
   String validationMessage = validateFields(f, "PLAINTEXT");
@@ -1049,7 +1066,6 @@ void validateNote() {
 void validateArtefact() {
   List f = new ArrayList(); // Fields to be validated
 
-  f.add(fieldPair("Artefact/Artefact/Artefact_Spit_ID", "{Spit_ID}"));
   f.add(fieldPair("Artefact/Artefact/Artefact_ID", "{Artefact_ID}"));
   f.add(fieldPair("Artefact/Artefact/Artefact_Class", "{Artefact_Class}"));
 
@@ -1339,10 +1355,10 @@ void addNavigationButtons(String tabgroup) {
     }
     actionOn() {
       if(isNull(getUuid(tabgroup))) {
-          newRecord(tabgroup, true);
-          showToast("{New_record_created}");
+        showAlert("{Warning}", "{The_current_record_has_not_been_saved_yet}", "newRecord(\""+tabgroup+"\", true)", "");
       } else {
-          showAlert("{Warning}", "{Any_unsaved_changes_will_be_lost}", "newRecord(\""+tabgroup+"\", true)", "");
+        newRecord(tabgroup, true);
+        showToast("{New_record_created}");
       }
     }
   }, "success");
@@ -1352,9 +1368,9 @@ void addNavigationButtons(String tabgroup) {
     }
     actionOn() {
       if(!isNull(getUuid(tabgroup))) {
-          duplicateRecord(tabgroup);
+        duplicateRecord(tabgroup);
       } else {
-          showWarning("{Warning}", "{This_record_is_unsaved_and_cannot_be_duplicated}");
+        showWarning("{Warning}", "{This_record_is_unsaved_and_cannot_be_duplicated}");
       }
     }
   }, "primary");
@@ -1689,7 +1705,7 @@ void newUnit(){
   String tabgroup = "Unit";
 
   String autoNumSource = "";
-  autoNumSource = getFieldValue("Control/Excavation_Data/Next_Unit_ID");
+  autoNumSource = getFieldValue("Control/Excavation_Data/Next_Unit_Unit_ID");
   if (isNull(autoNumSource)) {
     showWarning("{Alert}","{A_next_ID_has_not_been_entered_please_provide_one}");
     return;
@@ -1700,7 +1716,7 @@ void newUnit(){
   populateAuthorAndTimestamp(tabgroup);
   populateEntityListsInTabGroup(tabgroup);
   String autoNumDest = "";
-  autoNumDest = "Unit/Soil/Unit_ID";
+  autoNumDest = "Unit/Soil/Unit_Unit_ID";
   incAutoNum(autoNumDest);
   onCreateUnit__();
 
@@ -1758,7 +1774,7 @@ void duplicateUnit(){
 
   disableAutoSave(tabgroup);
   String autoNumDest = "";
-  autoNumDest = "Unit/Soil/Unit_ID";
+  autoNumDest = "Unit/Soil/Unit_Unit_ID";
   incAutoNum(autoNumDest);
 
   clearGpsInTabGroup(tabgroup);
@@ -2621,7 +2637,7 @@ Integer incField(String ref) {
 
 List getStartingIdPaths() {
   List l = new ArrayList();
-  l.add("Control/Excavation_Data/Next_Unit_ID");
+  l.add("Control/Excavation_Data/Next_Unit_Unit_ID");
   l.add("Control/Excavation_Data/Next_Spit_ID");
   l.add("Control/Excavation_Data/Next_Artefact_ID");
 
@@ -2665,7 +2681,7 @@ for (ref : getStartingIdPaths()) {
 
 void incAutoNum(String destPath) {
   Map destToSource = new HashMap();
-  destToSource.put("Unit/Soil/Unit_ID", "Control/Excavation_Data/Next_Unit_ID");
+  destToSource.put("Unit/Soil/Unit_Unit_ID", "Control/Excavation_Data/Next_Unit_Unit_ID");
   destToSource.put("Spit/Spit_Info/Spit_ID", "Control/Excavation_Data/Next_Spit_ID");
   destToSource.put("Artefact/Artefact/Artefact_ID", "Control/Excavation_Data/Next_Artefact_ID");
 
@@ -2701,7 +2717,7 @@ void populateMenuWithEntities (
     " WHERE relationshipid IN (SELECT relationshipid  " +
     "                            FROM latestnondeletedrelationship JOIN relntype USING (relntypeid) " +
     "                           WHERE relntypename = '"+relType+"') " +
-    "   AND parentuuid = " + parentUuid + " " +
+    "   AND parentuuid = '" + parentUuid + "' " +
     "   AND (childaenttypename = '"+entType+"' OR '"+entType+"' = '') " +
     " ORDER BY createdat DESC ";
 
@@ -2919,52 +2935,66 @@ void onClickControlNewSpit () {
 
 inheritFieldValue(
     "Control/Excavation_Data/Job_Name",
-    "Trench/Trench_Info/Job_Name"
+    "Trench/Trench_Info/Job_Name",
+    false
 );
 
 inheritFieldValue(
     "Trench/Trench_Info/Job_Name",
-    "Unit/Soil/Unit_Job_Name"
+    "Unit/Soil/Unit_Job_Name",
+    false
+);
+
+inheritFieldValue(
+    "Trench/Trench_Info/Trench_ID",
+    "Unit/Soil/Unit_Trench_ID",
+    false
 );
 
 inheritFieldValue(
     "Trench/Trench_Info/Job_Name",
-    "Spit/Spit_Info/Spit_Job_Name"
+    "Spit/Spit_Info/Spit_Job_Name",
+    false
+);
+
+inheritFieldValue(
+    "Trench/Trench_Info/Trench_ID",
+    "Spit/Spit_Info/Spit_Trench_ID",
+    false
 );
 
 inheritFieldValue(
     "Trench/Trench_Info/Job_Name",
-    "Photograph_Log/Photograph_Log/Photograph_Log_Job_Name"
+    "Photograph_Log/Photograph_Log/Photograph_Log_Job_Name",
+    false
+);
+
+inheritFieldValue(
+    "Trench/Trench_Info/Trench_ID",
+    "Photograph_Log/Photograph_Log/Photograph_Log_Trench_ID",
+    false
 );
 
 inheritFieldValue(
     "Trench/Trench_Info/Job_Name",
-    "Note/Note/Note_Job_Name"
+    "Note/Note/Note_Job_Name",
+    false
 );
 
 inheritFieldValue(
     "Trench/Trench_Info/Trench_ID",
-    "Unit/Soil/Unit_Trench_ID"
-);
-
-inheritFieldValue(
-    "Trench/Trench_Info/Trench_ID",
-    "Spit/Spit_Info/Spit_Trench_ID"
-);
-
-inheritFieldValue(
-    "Trench/Trench_Info/Trench_ID",
-    "Photograph_Log/Photograph_Log/Photograph_Log_Trench_ID"
-);
-
-inheritFieldValue(
-    "Trench/Trench_Info/Trench_ID",
-    "Note/Note/Note_Trench_ID"
+    "Note/Note/Note_Trench_ID",
+    false
 );
 
 inheritFieldValue(
     "Spit/Spit_Info/Spit_ID",
     "Artefact/Artefact/Artefact_Spit_ID"
+);
+
+inheritFieldValue(
+    "Unit/Soil/Unit_Unit_ID",
+    "Artefact/Artefact/Artefact_Unit_ID"
 );
 
 /***************************** TRENCH DUPLICATION *****************************/

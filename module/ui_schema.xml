@@ -24,7 +24,7 @@
           <Control>
             <Excavation_Data>
               <Job_Name/>
-              <Next_Unit_ID/>
+              <Next_Unit_Unit_ID/>
               <Next_Spit_ID/>
               <Next_Artefact_ID/>
               <New_Trench/>
@@ -117,7 +117,7 @@
               <Unit_Job_Name/>
               <Unit_Trench_ID/>
               <author/>
-              <Unit_ID/>
+              <Unit_Unit_ID/>
               <Horizon/>
               <Depth_cm/>
               <pH/>
@@ -186,6 +186,7 @@
             <Artefact>
               <Artefact_Spit_ID/>
               <Artefact_ID/>
+              <Artefact_Unit_ID/>
               <X/>
               <Y/>
               <Z/>
@@ -199,12 +200,12 @@
           <logic/>
         </faims>
       </instance>
-      <bind type="decimal" nodeset="/faims/Control/Excavation_Data/Next_Unit_ID"/>
+      <bind type="decimal" nodeset="/faims/Control/Excavation_Data/Next_Unit_Unit_ID"/>
       <bind type="decimal" nodeset="/faims/Control/Excavation_Data/Next_Spit_ID"/>
       <bind type="decimal" nodeset="/faims/Control/Excavation_Data/Next_Artefact_ID"/>
       <bind type="decimal" nodeset="/faims/Trench/Trench_Info/Distance_to_Water_km"/>
       <bind type="decimal" nodeset="/faims/Trench/Slope/Slope_Degree"/>
-      <bind type="decimal" nodeset="/faims/Unit/Soil/Unit_ID"/>
+      <bind type="decimal" nodeset="/faims/Unit/Soil/Unit_Unit_ID"/>
       <bind type="decimal" nodeset="/faims/Unit/Soil/Depth_cm"/>
       <bind type="decimal" nodeset="/faims/Unit/Soil/pH"/>
       <bind type="decimal" nodeset="/faims/Spit/Spit_Info/Spit_ID"/>
@@ -258,8 +259,8 @@
         <input ref="Job_Name">
           <label>{Job_Name}</label>
         </input>
-        <input ref="Next_Unit_ID" faims_style_class="required">
-          <label>{Next_Unit_ID}</label>
+        <input ref="Next_Unit_Unit_ID" faims_style_class="required">
+          <label>{Next_Unit_Unit_ID}</label>
         </input>
         <input ref="Next_Spit_ID" faims_style_class="required">
           <label>{Next_Spit_ID}</label>
@@ -545,7 +546,7 @@
           <label>{author}</label>
           <!--WARNING: Flags ignored-->
         </input>
-        <input faims_attribute_type="measure" ref="Unit_ID" faims_attribute_name="Unit ID" faims_style_class="required">
+        <input faims_attribute_type="measure" ref="Unit_Unit_ID" faims_attribute_name="Unit Unit ID" faims_style_class="required">
           <label>{Unit_ID}</label>
         </input>
         <input faims_attribute_type="measure" ref="Horizon" faims_attribute_name="Horizon" faims_style_class="required">
@@ -770,11 +771,14 @@
       <label>{Artefact}</label>
       <group ref="Artefact">
         <label>{Artefact}</label>
-        <input faims_attribute_type="measure" ref="Artefact_Spit_ID" faims_attribute_name="Artefact Spit ID" faims_read_only="true" faims_style_class="required">
+        <input faims_attribute_type="measure" ref="Artefact_Spit_ID" faims_attribute_name="Artefact Spit ID" faims_read_only="true">
           <label>{Spit_ID}</label>
         </input>
         <input faims_attribute_type="measure" ref="Artefact_ID" faims_attribute_name="Artefact ID" faims_style_class="required">
           <label>{Artefact_ID}</label>
+        </input>
+        <input faims_attribute_type="measure" ref="Artefact_Unit_ID" faims_attribute_name="Artefact Unit ID" faims_read_only="true">
+          <label>{Unit_ID}</label>
         </input>
         <input faims_attribute_type="measure" ref="X" faims_attribute_name="X">
           <label>{X}</label>

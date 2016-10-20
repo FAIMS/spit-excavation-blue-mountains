@@ -167,9 +167,10 @@
       Trench ID
     </Unit_Trench_ID>
     <author  f="readonly"/>
-    <Unit_ID f="id autonum notnull">
+    <Unit_Unit_ID f="id autonum notnull">
+      Unit ID
       <str><fmt>$2 - </fmt></str>
-    </Unit_ID>
+    </Unit_Unit_ID>
     <Horizon f="id notnull">
       <str><fmt>$2</fmt></str>
     </Horizon>
@@ -368,22 +369,32 @@
 
 <Artefact>
   <Artefact>
-    <Artefact_Spit_ID f="id readonly notnull">
+    <Artefact_Spit_ID f="id readonly">
       Spit ID
       <str>
-        <fmt>Spit ID: $2 - </fmt>
+        <pos>1</pos>
+        <fmt>{{ if $2 then "Spit ID: $2 - " }}</fmt>
       </str>
     </Artefact_Spit_ID>
     <Artefact_ID f="id autonum notnull">
       <str>
+        <pos>3</pos>
         <fmt>Artefact ID: $2 - </fmt>
       </str>
     </Artefact_ID>
+    <Artefact_Unit_ID f="id readonly">
+      Unit ID
+      <str>
+        <pos>2</pos>
+        <fmt>{{ if $2 then "Unit ID: $2 - " }}</fmt>
+      </str>
+    </Artefact_Unit_ID>
     <X b="decimal"/>
     <Y b="decimal"/>
     <Z b="decimal"/>
     <Artefact_Class f="id notnull notnull">
       <str>
+        <pos>4</pos>
         <fmt>$1</fmt>
       </str>
       <opts>
@@ -510,52 +521,66 @@ void onClickControlNewSpit () {
 
 inheritFieldValue(
     "Control/Excavation_Data/Job_Name",
-    "Trench/Trench_Info/Job_Name"
+    "Trench/Trench_Info/Job_Name",
+    false
 );
 
 inheritFieldValue(
     "Trench/Trench_Info/Job_Name",
-    "Unit/Soil/Unit_Job_Name"
+    "Unit/Soil/Unit_Job_Name",
+    false
+);
+
+inheritFieldValue(
+    "Trench/Trench_Info/Trench_ID",
+    "Unit/Soil/Unit_Trench_ID",
+    false
 );
 
 inheritFieldValue(
     "Trench/Trench_Info/Job_Name",
-    "Spit/Spit_Info/Spit_Job_Name"
+    "Spit/Spit_Info/Spit_Job_Name",
+    false
+);
+
+inheritFieldValue(
+    "Trench/Trench_Info/Trench_ID",
+    "Spit/Spit_Info/Spit_Trench_ID",
+    false
 );
 
 inheritFieldValue(
     "Trench/Trench_Info/Job_Name",
-    "Photograph_Log/Photograph_Log/Photograph_Log_Job_Name"
+    "Photograph_Log/Photograph_Log/Photograph_Log_Job_Name",
+    false
+);
+
+inheritFieldValue(
+    "Trench/Trench_Info/Trench_ID",
+    "Photograph_Log/Photograph_Log/Photograph_Log_Trench_ID",
+    false
 );
 
 inheritFieldValue(
     "Trench/Trench_Info/Job_Name",
-    "Note/Note/Note_Job_Name"
+    "Note/Note/Note_Job_Name",
+    false
 );
 
 inheritFieldValue(
     "Trench/Trench_Info/Trench_ID",
-    "Unit/Soil/Unit_Trench_ID"
-);
-
-inheritFieldValue(
-    "Trench/Trench_Info/Trench_ID",
-    "Spit/Spit_Info/Spit_Trench_ID"
-);
-
-inheritFieldValue(
-    "Trench/Trench_Info/Trench_ID",
-    "Photograph_Log/Photograph_Log/Photograph_Log_Trench_ID"
-);
-
-inheritFieldValue(
-    "Trench/Trench_Info/Trench_ID",
-    "Note/Note/Note_Trench_ID"
+    "Note/Note/Note_Trench_ID",
+    false
 );
 
 inheritFieldValue(
     "Spit/Spit_Info/Spit_ID",
     "Artefact/Artefact/Artefact_Spit_ID"
+);
+
+inheritFieldValue(
+    "Unit/Soil/Unit_Unit_ID",
+    "Artefact/Artefact/Artefact_Unit_ID"
 );
 
 /***************************** TRENCH DUPLICATION *****************************/
