@@ -2,7 +2,7 @@
 This module was created for the excavation of the **Bleichert Ropeway Tension Pit**, located in the Blue Mountains National Park, organised by the Blue Mountains World Heritage Institute, Katoomba, Australia. The module has been designed to document an entire workflow of archaeological excavation, using  an arbitrarily assigned measurement of depth and extent (spits).
 
 ## Authorship:
-This module was co-developed by Adela Sobotkova at the FAIMS Project, Department of Ancient History, Macquarie University.
+This module was developed by Adela Sobotkova at the FAIMS Project, Department of Ancient History, Macquarie University.
 
 ## Funding:
 Development of this module was funded by the **Research Attraction and Acceleration Program (RAAP)** aimed to support innovation and investment in the New South Wales in 2016 and 2017.
