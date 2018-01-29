@@ -5,7 +5,7 @@ This module was created for the excavation of the **Bleichert Ropeway Tension Pi
 This module was developed by Adela Sobotkova at the FAIMS Project, Department of Ancient History, Macquarie University.
 
 ## Funding:
-Development of this module was funded by the **Research Attraction and Acceleration Program (RAAP)** aimed to support innovation and investment in the New South Wales in 2016 and 2017.
+Development of this module was funded by the **Research Attraction and Acceleration Program (RAAP) NSW Department of Industry 16805/00** aimed to support innovation and investment in the New South Wales in 2016 and 2017.
 
 ## Date of release:
 September 2016 
